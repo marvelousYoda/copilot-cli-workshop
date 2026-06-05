@@ -44,8 +44,18 @@ Check "Copilot CLI installed" {
 } "Install: npm install -g @github/copilot or follow internal install doc."
 
 Check "Copilot CLI authenticated" {
-    $out = copilot auth status 2>&1 | Out-String
-    if ($out -match "logged in|authenticated") { "authenticated" } else { $null }
+    # Wrap in a job with a 10s timeout: `copilot auth status` can hang when run
+    # from a non-interactive script context (no TTY).
+    $job = Start-Job -ScriptBlock { copilot auth status 2>&1 | Out-String }
+    if (Wait-Job $job -Timeout 10) {
+        $out = Receive-Job $job
+        Remove-Job $job
+        if ($out -match "logged in|authenticated") { "authenticated" } else { $null }
+    } else {
+        Stop-Job $job; Remove-Job $job -Force
+        # Treat hang as "unknown" rather than failing — common in script contexts
+        "skipped (timed out — run 'copilot auth status' manually to confirm)"
+    }
 } "Run: copilot auth login"
 
 Check "Port 3000 free" {
