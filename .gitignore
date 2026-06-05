@@ -1,0 +1,14 @@
+node_modules/
+data/*.db
+data/*.sqlite
+.env
+.DS_Store
+coverage/
+
+# Workshop runtime artifacts (regenerated each session)
+.workshop/
+docs/dashboard.html
+
+# Word temp/lock files
+~$*
+*.new.docx

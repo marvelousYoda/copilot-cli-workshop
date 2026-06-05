@@ -1,0 +1,22 @@
+{
+  "name": "oncall-handoff-notes",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Workshop starter: From Backlog to Product with Copilot CLI",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "jest --runInBand"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
