@@ -10,21 +10,33 @@
 
 ```powershell
 git clone <this repo>
-cd oncall-handoff-notes
+cd copilot-cli-workshop
 npm install
-npm test                # should pass
-npm start               # open http://localhost:3000
+npm test                # should pass (2 smoke tests)
 ```
 
-Configure ADO + run the pre-flight:
+**Configure ADO** (sets env vars + writes `.copilot/mcp.json` in one shot):
 
 ```powershell
-$env:ADO_ORG = "your-org"
-$env:ADO_PROJECT = "workshop-project"
+.\configure.ps1
+# It will prompt for: ADO org name, ADO project name, and your area path.
+# Or pass them on the command line:
+# .\configure.ps1 -Org "myorg" -Project "MyProject" -AreaPath "MyProject\Workshop"
+```
+
+**Pre-flight checks:**
+
+```powershell
 .\verify.ps1
 ```
 
-All green? You're ready.
+All green? You're ready. Then start Copilot CLI in the same terminal:
+
+```powershell
+copilot
+```
+
+> **Heads-up:** the ADO env vars live for one terminal session. If you close this window and open a new one, **re-run `.\configure.ps1`** before starting `copilot` — otherwise the skills will lose their area-path filter and create work items in the wrong place.
 
 ---
 
@@ -297,7 +309,8 @@ npm install
 | `verify.ps1` fails on Copilot CLI | `npm install -g @github/copilot` then `copilot auth login` |
 | `verify.ps1` fails on `az` | `az login` and `az extension add --name azure-devops` |
 | Port 3000 in use | `$env:PORT=3001; npm start` |
-| ADO MCP can't see my project | Edit `.copilot/mcp.json` with your org/project, restart Copilot CLI |
+| ADO MCP can't see my project | Edit `.copilot/mcp.json` with your org/project (or just re-run `.\configure.ps1`), restart Copilot CLI |
+| I opened a new terminal and my work items go to the wrong area | ADO env vars are session-scoped. Re-run `.\configure.ps1` in the new terminal, **then** restart `copilot`. |
 | Tests hang | Make sure you're on Node 20+: `node --version` |
 | Dashboard looks empty | You haven't run `backlog-to-ado` yet, or your ADO items aren't tagged `workshop` |
 | WorkIQ import returns nothing | The `import:workiq` script will use mock data automatically. That's fine for the workshop. |
