@@ -15,6 +15,7 @@ Both runs use **exactly the same skill** with no parameters. The dashboard adapt
 
 ## Inputs
 - No inputs required. The skill reads all ADO work items tagged `workshop` from the configured project.
+- If `$env:ADO_PARTICIPANT` is set, the skill further scopes to items tagged `participant:<alias>` so each participant sees only their own backlog when the workshop area path is shared.
 
 ## Prerequisites
 - The ADO MCP server must be available. If it isn't, stop and tell the user:
@@ -25,6 +26,7 @@ Both runs use **exactly the same skill** with no parameters. The dashboard adapt
 ### Step 1 — Fetch the backlog
 - Use ADO MCP to list all work items with tag `workshop` in the project.
 - **If `$env:ADO_AREA_PATH` is set**, further filter to items where `System.AreaPath` starts with that value. This ensures we only analyze items the workshop participant created.
+- **If `$env:ADO_PARTICIPANT` is set**, further filter to items whose `System.Tags` contains `participant:<alias>`. This isolates each participant's backlog when area path is shared.
 - Fetch each item's full fields: title, description, AC, state, assignee, priority, tags, parent link, created date, changed date, linked PRs.
 
 ### Step 2 — Analyze each item against these checks
