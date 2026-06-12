@@ -139,17 +139,23 @@ Click into a flagged story in ADO — you'll see the skill's comment explaining 
 
 ### Phase 4 — Build the prototype *(20 min)*
 
-Pick one story (preferably your F7 or the F6 WorkIQ import — those are the most interesting):
+**Suggested build order.** The stories build on each other, so tackle them in this sequence:
+
+1. **Create a handoff note (F1)** — the foundation: the form, the `notes` table, and the create route.
+2. **List all handoff notes (F2)** — a server-side page that renders the notes you just created, newest first.
+3. **WorkIQ import (F6)** *(stretch / homework)* — the agentic story. If you run out of time in the workshop, this is a fun one to try afterward on your own.
+
+Start by finding and claiming a story:
 
 ```
 Show me ready stories in my ADO project that are not assigned.
 ```
 
 ```
-Assign story #<ID> to me, move it to In Progress, and tell me what its AC are.
+Assign story #<ID> to me, move it to Active, and tell me what its Acceptance Criteria is.
 ```
 
-Then build:
+Then build it:
 
 ```
 Implement ADO story #<ID> in this repo. Use Express and better-sqlite3.
@@ -157,7 +163,11 @@ Add the route(s), a minimal HTML view if needed, and at least one Jest test in t
 Run the tests when done.
 ```
 
+Once F1 is green, repeat the claim → build loop for **F2 (List all handoff notes)** so you can actually see the notes you create. Then, if time allows, take on **F6 (WorkIQ import)** — or save it as homework.
+
 Iterate with Copilot CLI as it works.
+
+> 💡 **Go for the full app — and beyond.** Implementing *all* the stories gets you a genuinely useful, full-featured handoff tool, so don't stop at one. And don't feel boxed in by the backlog: if you imagine a feature that isn't on the list — dark mode, search, Slack/Teams export, an LLM-written shift summary, whatever — build it! This is the whole point of working with AI: it collapses the cost of trying ideas, so lean into your creativity and go above and beyond. The best demos at the end are usually the ones where someone followed a "what if…" and let Copilot CLI run with it.
 
 **Review before committing:**
 
@@ -188,7 +198,10 @@ git commit -m "feat: implement story #<ID>"
 # Happy path
 Invoke-RestMethod -Method POST -Uri http://localhost:3000/notes `
   -ContentType "application/json" `
-  -Body '{"title":"Test handoff","body":"Watch the SQL queue at 9am."}'
+  -Body '{"title":"Test handoff","service":"payments","severity":"urgent","details":"Watch the SQL queue at 9am.","author":"You"}'
+
+# See it in the list (newest first)
+Invoke-RestMethod -Uri http://localhost:3000/notes -Headers @{ Accept = "application/json" }
 
 # Sad path (should return a 400 + error)
 Invoke-RestMethod -Method POST -Uri http://localhost:3000/notes `
