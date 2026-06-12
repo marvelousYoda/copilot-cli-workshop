@@ -81,8 +81,8 @@ Check "ADO project reachable" {
     return $null
 } "Set `$env:ADO_ORG and `$env:ADO_PROJECT, then sign in to ADO in your browser."
 
-Check ".copilot/mcp.json present" {
-    if (Test-Path ".\.copilot\mcp.json") { "found" } else { $null }
+Check ".mcp.json present" {
+    if (Test-Path ".\.mcp.json") { "found" } else { $null }
 } "You may be in the wrong folder. cd into the cloned workshop repo."
 
 Check "npm install completed" {

@@ -15,7 +15,7 @@ npm install
 npm test                # should pass (2 smoke tests)
 ```
 
-**Configure ADO** (sets env vars + writes `.copilot/mcp.json` in one shot):
+**Configure ADO** (sets env vars + writes `.mcp.json` in one shot):
 
 ```powershell
 .\configure.ps1
@@ -277,8 +277,8 @@ Use these anytime — no skill needed.
 ├── data/                         # SQLite file will live here
 ├── docs/                         # backlog-organizer writes dashboard.html here
 ├── .workshop/                    # spec-to-tasks writes backlog.json here
+├── .mcp.json                     # ADO MCP server config (edit org)
 ├── .copilot/
-│   ├── mcp.json                  # ADO MCP server config (edit org/project)
 │   └── skills/
 │       ├── spec-to-tasks.md
 │       ├── backlog-to-ado.md
@@ -315,7 +315,7 @@ npm install
 | `verify.ps1` fails on Copilot CLI | `npm install -g @github/copilot` then `copilot auth login` |
 | `verify.ps1` fails on `az` | `az login` and `az extension add --name azure-devops` |
 | Port 3000 in use | `$env:PORT=3001; npm start` |
-| ADO MCP can't see my project | Edit `.copilot/mcp.json` with your org/project (or just re-run `.\configure.ps1`), restart Copilot CLI |
+| ADO MCP can't see my project | Edit `.mcp.json` with your org (or just re-run `.\configure.ps1`), restart Copilot CLI |
 | I opened a new terminal and my work items go to the wrong area | ADO env vars are session-scoped. Re-run `.\configure.ps1` in the new terminal, **then** restart `copilot`. |
 | Tests hang | Make sure you're on Node 20+: `node --version` |
 | `npm install` fails building `better-sqlite3` (`gyp ERR! find Python`) | `better-sqlite3` is a native module that uses a **prebuilt binary** for your Node version — no Python/compiler needed. The error means npm couldn't find a prebuilt binary and fell back to compiling from source. Fix: use a Node version with prebuilds. This repo pins `better-sqlite3@^12`, which has prebuilds through **Node 24**. If you're on an even newer Node, install **Node 20 or 22 LTS** (`node --version` to check), delete `node_modules`, and re-run `npm install`. |
