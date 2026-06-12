@@ -15,6 +15,16 @@ npm install
 npm test                # should pass (2 smoke tests)
 ```
 
+Before starting the lab, make sure you are in the cloned repo directory and can find the two key workshop inputs:
+
+```powershell
+pwd
+dir spec
+dir .github\skills
+```
+
+You should see `spec/oncall-handoff-notes.md` and six skills under `.github/skills`.
+
 **Configure ADO** (sets env vars + writes `.mcp.json` in one shot):
 
 ```powershell
@@ -76,15 +86,47 @@ Run the spec-to-tasks skill on spec/oncall-handoff-notes.md
 
 > *Optional (if you have time): the spec has a few `<OPTIONAL EDIT>` markers where you can replace example content with your own voice. Skip them if you're pressed for time — the spec works as-is.*
 
-### Phase 2 — Generate the backlog in ADO *(7 min)*
+### Phase 2 — Create your ADO Feature, then generate stories *(7 min)*
+
+In the video/demo, create the parent Feature manually in ADO first. This makes the shared project safer and easier to explain because everyone can see their own clearly named container before Copilot writes anything.
+
+Create a **Feature** named:
+
+```text
+<alias> - On-Call Handoff Notes
+```
+
+Example:
+
+```text
+shaygupt - On-Call Handoff Notes
+```
+
+Copy the Feature URL from ADO. It should look like:
+
+```text
+https://o365exchange.visualstudio.com/Enterprise%20Cloud/_workitems/edit/<FEATURE_ID>
+```
+
+Then ask the skill to create the backlog under that Feature:
 
 ```
-Run the backlog-to-ado skill
+Run the backlog-to-ado skill using this parent feature: <FEATURE_URL>
 ```
 
-**Output:** an Epic + 6–7 User Stories appear in your ADO project, all tagged `workshop`.
+**Output:** User Stories appear as children of your manually created Feature, all tagged `workshop`.
 
-### Phase 2.5 — Poke the backlog with freeform MCP *(6 min)*
+### Phase 2.5 — Decompose stories into assigned Tasks *(3 min)*
+
+Run one more skill to create the implementation Tasks, assign them to you, and set Effort (Hours) using the workshop's 1/3/5-hour sizing convention:
+
+```
+Run the backlog-to-tasks skill
+```
+
+**Output:** Tasks appear under the User Stories, assigned to you, with **Original Estimate** and **Remaining** set to 1, 3, or 5 hours.
+
+### Phase 2.6 — Poke the backlog with freeform MCP *(6 min)*
 
 This is where you *feel* what ADO MCP is. Try a few of these, one at a time:
 
@@ -107,21 +149,23 @@ Find any stories whose title mentions "workiq" and tag them "needs-design".
 The point: **MCP = Copilot CLI can do anything ADO's API can do, in plain English.**
 
 > **Area-path scoping is automatic.** `.github/copilot-instructions.md` tells Copilot CLI to
-> scope every ADO read/write to your `$env:ADO_AREA_PATH`, so even freeform prompts like the
-> ones above won't touch other teams' items on a shared project. (Loaded at startup — if you
-> edit it, `/restart`.) You can still name the area path explicitly in a prompt if you want.
+> scope ADO read/write work to your `$env:ADO_AREA_PATH` or to the validated alias-prefixed
+> Feature link you provided in Phase 2, so even freeform prompts like the ones above won't
+> touch other teams' items on a shared project. (Loaded at startup — if you edit it,
+> `/restart`.) You can still name the area path explicitly in a prompt if you want.
 
 #### Power-user prompt (optional, 1 min)
 
-If you want to see hierarchical decomposition in action — useful when you're about to pick up a story and want it broken into half-hour chunks:
+If you want to see hierarchical decomposition in action for a custom or newly imagined story:
 
 ```
-Pick the story for F6 (WorkIQ import). Decompose it into 3–5 implementation tasks
-in ADO, linked as children of the story. Each task should be small enough to do
-in 30 minutes. Don't assign them, and pin them under the same area path as the parent.
+Pick story #<ID>. Decompose it into 3–5 implementation tasks
+in ADO, linked as children of the story. Each task should be small enough to do.
+Assign them to me, and pin them under the same area path as the parent.
+For each Task, set Effort (Hours): Original Estimate and Remaining to one of 1, 3, or 5.
 ```
 
-> **Note:** We intentionally don't decompose every story upfront — it would flood the dashboard. Decompose **on demand**, only when you're about to work on something. This is closer to how real teams operate.
+> **Effort sizing rule of thumb:** use **1 hour** for a small route/query change, **3 hours** for normal UI + test work, and **5 hours** for larger integration work like WorkIQ import. The `backlog-to-tasks` skill applies this automatically for the standard workshop backlog.
 
 ### Phase 3 — Visualize the backlog (Run #1) *(7 min)*
 
@@ -130,10 +174,12 @@ Run the backlog-organizer skill
 ```
 
 **Output:** `docs/dashboard.html` opens in your browser. You'll see:
-- A low-ish health score (40–60s is normal here)
-- 6+ stories all missing owners (intentional)
-- Maybe a few "unclear" or "no priority" flags
-- An empty burndown
+- A Feature-scoped **Backlog Item health** score
+- A burn-down chart for remaining stories / effort
+- New / Active / Closed state for User Stories and Tasks under your Feature
+- Any gaps the organizer found, without mixing in other participants' backlog items
+
+The dashboard is deterministic for the same ADO state: it reads only descendants of your alias-prefixed Feature, sorts items by ID, uses fixed health formulas, and avoids tag-only or area-wide fallbacks.
 
 Click into a flagged story in ADO — you'll see the skill's comment explaining what it found.
 
@@ -265,12 +311,15 @@ Same skill, run twice. That's the lesson.
 | Skill | What it does | Mutates state? |
 |---|---|---|
 | `spec-to-tasks` | Reads the spec → writes `.workshop/backlog.json` | No (file write only) |
-| `backlog-to-ado` | Reads the JSON → creates ADO Epic + Stories | Yes (creates ADO items, idempotent) |
+| `backlog-to-ado` | Reads the JSON → creates ADO User Stories under your manual Feature | Yes (creates ADO items, idempotent) |
+| `backlog-to-tasks` | Creates child Tasks, assigns them, and sets 1/3/5-hour Effort | Yes (creates/updates Task items, idempotent) |
 | `backlog-organizer` | Analyzes the ADO backlog → tags gaps, adds comments, renders dashboard | Yes (tags + comments only; never changes state/assignee) |
 | `pr-review` | Reviews your PR against team standards | Yes (posts review on PR) |
 | `pr-summarizer` | Generates a clean PR description from the diff | Yes (updates PR description) |
 
-All skills live in `.copilot/skills/` and are version-controlled with the repo. Share them with your team by sharing the repo.
+All skills live in `.github/skills/<skill-name>/SKILL.md` and are version-controlled with the repo. Share them with your team by sharing the repo.
+
+**What is a skill?** A skill is a small Markdown instruction pack that teaches Copilot CLI how to do one repeatable workflow. For example, `.github/skills/backlog-to-tasks/SKILL.md` tells Copilot how to create child Tasks, assign them, and set Effort without a pile of follow-up prompts.
 
 ---
 
@@ -331,14 +380,14 @@ What changed in this repo in the last 24 hours?
 ├── .workshop/                    # spec-to-tasks writes backlog.json here
 ├── .mcp.json                     # ADO MCP server config (edit org)
 ├── .github/
-│   └── copilot-instructions.md   # Auto-loaded rules (scopes ADO work to your area path)
-├── .copilot/
+│   ├── copilot-instructions.md   # Auto-loaded rules (scopes ADO work to your area path)
 │   └── skills/
-│       ├── spec-to-tasks.md
-│       ├── backlog-to-ado.md
-│       ├── backlog-organizer.md
-│       ├── pr-review.md
-│       └── pr-summarizer.md
+│       ├── spec-to-tasks/SKILL.md
+│       ├── backlog-to-ado/SKILL.md
+│       ├── backlog-to-tasks/SKILL.md
+│       ├── backlog-organizer/SKILL.md
+│       ├── pr-review/SKILL.md
+│       └── pr-summarizer/SKILL.md
 ├── verify.ps1                    # Pre-flight env check
 ├── package.json
 └── README.md                     # You are here
@@ -375,7 +424,7 @@ npm install
 | `npm install` fails building `better-sqlite3` (`gyp ERR! find Python`) | `better-sqlite3` is a native module that uses a **prebuilt binary** for your Node version — no Python/compiler needed. The error means npm couldn't find a prebuilt binary and fell back to compiling from source. Fix: use a Node version with prebuilds. This repo pins `better-sqlite3@^12`, which has prebuilds through **Node 24**. If you're on an even newer Node, install **Node 20 or 22 LTS** (`node --version` to check), delete `node_modules`, and re-run `npm install`. |
 | Dashboard looks empty | You haven't run `backlog-to-ado` yet, or your ADO items aren't tagged `workshop` |
 | WorkIQ import returns nothing | The `import:workiq` script will use mock data automatically. That's fine for the workshop. |
-| I edited a skill but my changes aren't taking effect | **Restart Copilot CLI.** Skills are loaded once at startup. Run `/restart` to reload while keeping your current session, or `exit` then `copilot` to re-launch. **Tip:** when you `exit`, the CLI prints a session ID with a `copilot --resume <id>` command so you can pick the conversation back up where you left off. |
+| I edited a skill but my changes aren't taking effect | **Reload skills.** Run `/skills reload`, or run `/restart` to reload the whole CLI while keeping your current session. **Tip:** when you `exit`, the CLI prints a session ID with a `copilot --resume <id>` command so you can pick the conversation back up where you left off. |
 | Dashboard didn't regenerate after re-running | Delete `docs/dashboard.html` first, then re-run the skill. Browsers also cache — hard-refresh with `Ctrl+F5`. |
 
 ---
@@ -384,5 +433,5 @@ npm install
 
 - **Fork this repo** for your team
 - **Edit the spec** to describe your real product
-- **Tweak the skills** in `.copilot/skills/` — they're just markdown, version-controlled with your code
+- **Tweak the skills** in `.github/skills/` — they're just markdown, version-controlled with your code
 - **Add your own skills** — a skill is a markdown file with a `name` and `description`. Copilot CLI will discover them automatically.

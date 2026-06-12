@@ -23,5 +23,10 @@ When reading from, querying, or modifying Azure DevOps work items via the ADO MC
   workshop project where creating at the project root is acceptable — confirm with the user
   before proceeding. Never write to a known shared project
   (`Enterprise Cloud`, `OS`, `AzureDevOps`, `DevDiv`, `Office`) without an area path.
+- **If the user provides an explicit workshop Feature URL or ID**, you may fetch that single
+  Feature to read its `System.AreaPath`, but only proceed with writes if the Feature title is
+  clearly alias-prefixed (for example, `shaygupt - On-Call Handoff Notes`). Use that Feature's
+  area path as the boundary, and write only child items under that Feature. If the Feature is
+  not alias-prefixed, is outside the expected workshop area, or is not a Feature, stop.
 - If a request would touch items outside `$env:ADO_AREA_PATH`, ask the user to confirm before
   proceeding, and explain that it falls outside their workshop area path.
