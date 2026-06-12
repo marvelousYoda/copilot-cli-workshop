@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "ado": {
-      "command": "npx",
-      "args": ["-y", "@azure-devops/mcp", "REPLACE_WITH_ORG"]
-    }
-  }
-}
