@@ -174,10 +174,10 @@ Run the backlog-organizer skill
 ```
 
 **Output:** `docs/dashboard.html` opens in your browser. You'll see:
-- A low-ish health score (40–60s is normal here)
-- 6+ stories all missing owners (intentional)
-- Maybe a few "unclear" or "no priority" flags
-- An empty burndown
+- A Feature-scoped **Backlog Item health** score
+- A burn-down chart for remaining stories / effort
+- New / Active / Closed state for User Stories and Tasks under your Feature
+- Any gaps the organizer found, without mixing in other participants' backlog items
 
 Click into a flagged story in ADO — you'll see the skill's comment explaining what it found.
 

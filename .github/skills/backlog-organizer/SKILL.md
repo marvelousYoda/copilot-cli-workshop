@@ -1,20 +1,21 @@
 ---
 name: backlog-organizer
-description: Analyzes all workshop-tagged backlog items in ADO to categorize work, suggest priority, flag gaps (missing owners, unclear tasks, ambiguous lineage, stale items), and generate an HTML dashboard showing backlog structure, gaps, burndown, and overall health. Designed to be run twice — once after backlog creation, once after work is in flight.
+description: Analyzes the alias-prefixed workshop Feature in ADO, reviews its child User Stories and Tasks, and generates a focused HTML dashboard for Backlog Item health, burn-down, and New/Active/Closed state. Designed to be run after backlog-to-ado/backlog-to-tasks and again after work is in flight.
 ---
 
 # Backlog Organizer Skill
 
-You are a backlog quality analyst. You read the ADO backlog, **make it better** (add comments and tags), then render a self-contained HTML dashboard that shows the team's backlog state at a glance.
+You are a backlog quality analyst and frontend dashboard designer. You read the participant's alias-scoped ADO Feature, **make its child backlog better** (add comments and tags), then render a self-contained HTML dashboard that zeroes in on that Feature's Backlog Item health, burn-down, and User Story/Task state.
 
 This skill is run **twice** during the workshop:
-- **First run** (after `backlog-to-ado`): fresh backlog, many gaps. Dashboard shows a low health score and many flags.
+- **First run** (after `backlog-to-ado` / `backlog-to-tasks`): fresh Feature with child User Stories and Tasks. Dashboard shows Feature-scoped health, state, and remaining work.
 - **Second run** (after PRs are merged): work is in flight. Dashboard shows burndown, completion %, and an improved health score.
 
 Both runs use **exactly the same skill** with no parameters. The dashboard adapts to whatever state ADO is in.
 
 ## Inputs
-- No inputs required. The skill reads all ADO work items tagged `workshop` from the configured project.
+- Optional parent Feature URL or ID. If omitted, read `.workshop/backlog.json` and use `parent_feature.ado_id`.
+- Optional participant alias. If omitted, infer it from the parent Feature title prefix, for example `shaygupt - On-Call Handoff Notes`.
 
 ## Prerequisites
 - The ADO MCP server must be available. If it isn't, stop and tell the user:
@@ -23,9 +24,16 @@ Both runs use **exactly the same skill** with no parameters. The dashboard adapt
 ## What to do
 
 ### Step 1 — Fetch the backlog
-- Use ADO MCP to list all work items with tag `workshop` in the project.
-- **If `$env:ADO_AREA_PATH` is set**, further filter to items where `System.AreaPath` starts with that value. This ensures we only analyze items the workshop participant created.
-- Fetch each item's full fields: title, description, AC, state, assignee, priority, tags, parent link, created date, changed date, linked PRs.
+- Resolve the parent Feature:
+  - Accept a full ADO URL, a numeric Feature ID, or `.workshop/backlog.json` → `parent_feature.ado_id`.
+  - Fetch the work item and confirm `System.WorkItemType` is `Feature`.
+  - Confirm the Feature title is alias-prefixed, for example `<alias> - On-Call Handoff Notes`.
+  - Use the Feature's `System.AreaPath` as the scope boundary. If `$env:ADO_AREA_PATH` is set, it must match the Feature area path.
+- Fetch **only descendants of that validated Feature**:
+  - Include the child User Stories / Product Backlog Items.
+  - Include child Tasks under those stories.
+  - Exclude all other `workshop` items in the same area path, even if they match tags or titles.
+- Fetch each descendant's full fields: title, description, AC, state, assignee, priority, tags, parent link, created date, changed date, linked PRs, Original Estimate, Remaining Work, and Completed Work.
 
 ### Step 2 — Analyze each item against these checks
 
@@ -70,7 +78,7 @@ For each item that has at least one finding:
 
 ### Step 4 — Compute health metrics
 
-For all `workshop`-tagged items:
+For descendants of the validated alias-prefixed Feature only:
 
 | Metric | Formula |
 |---|---|
@@ -82,10 +90,19 @@ For all `workshop`-tagged items:
 | **Health score** | average of the 5 percentages above, rounded to nearest integer |
 
 Also compute:
-- **Total stories**, **stories Done**, **stories In Progress**, **stories New**
-- **Completion %** = `Done / Total × 100`
+- **Backlog Item health** for User Stories / Product Backlog Items only: ownership, AC coverage, priority coverage, task coverage, and remaining work coverage.
+- **Total User Stories**, **Total Tasks**, **Tasks with Effort**, **Total Original Estimate**, **Total Remaining Work**, **Total Completed Work**.
+- **Story state counts** using normalized buckets: `New`, `Active`, `Closed`.
+- **Task state counts** using normalized buckets: `New`, `Active`, `Closed`.
+- **Completion %** = `Closed User Stories / Total User Stories × 100`.
 - **Linked PRs**: count of work items with a linked PR
-- **Burndown points**: an array of `{date, remaining}` pairs computed from work item state-change history over the last 7 days (only meaningful on the second run)
+- **Burn-down points**: an array of `{date, remainingStories, remainingHours}` pairs over the last 7 days. The chart should show remaining stories as the primary line and remaining hours as a secondary line if effort data exists.
+
+**State normalization:**
+- `New`, `Proposed`, `To Do` → `New`
+- `Active`, `In Progress`, `Committed`, `Doing` → `Active`
+- `Resolved`, `Closed`, `Done`, `Removed` → `Closed`
+- Unknown states should appear as `New` only if the source state is empty; otherwise display them in a small "Other states" note but do not merge them into Closed.
 
 ### Step 5 — Render the dashboard
 
@@ -107,49 +124,75 @@ Write a single self-contained HTML file to `docs/dashboard.html` (create folder 
 - After successfully rendering the dashboard, write the updated `.workshop/dashboard-runs.json` with the new count and current timestamp.
 - This makes run-number tracking independent of the HTML file's existence — overwriting, deleting, or restoring the HTML doesn't affect it.
 
+### Dashboard design requirements
+
+- Design for a workshop audience watching a live demo: clear hierarchy, bold numbers, useful labels, no dense enterprise-report feel.
+- Use a polished modern dashboard aesthetic: large hero card, compact KPI cards, accessible contrast, tasteful color, and whitespace.
+- Keep the dashboard **Feature-scoped**. The header must show the Feature ID, Feature title, alias, and area path so the audience can see it is not mixing participants.
+- Use the phrase **"Backlog Item health"** in the hero/header area.
+- Prefer visual cards and SVG charts over large tables. Tables are allowed for detailed story/task drill-down.
+
 ### Dashboard sections (in this order)
 
 1. **Header**
-   - Title: "On-Call Handoff Notes — Backlog Health"
-   - Subtitle: "Run #N · Generated <timestamp>"
-   - Big health score (0–100) with color: red <50, amber 50–80, green >80
+   - Title: "On-Call Handoff Notes — Backlog Item Health"
+   - Subtitle: "Feature #<id> · <alias> · Run #N · Generated <timestamp>"
+   - Show the Feature title and area path.
+   - Big health score (0–100) with color: red <50, amber 50–80, green >80.
 
-2. **At a glance** (4 KPI cards in a row)
-   - Total stories · Done · In Progress · Open gaps
+2. **Feature scope at a glance** (KPI cards)
+   - User Stories
+   - Tasks
+   - Remaining hours
+   - Open gaps
+   - Linked PRs
 
-3. **Health breakdown** (horizontal bar chart, 5 bars)
-   - Ownership %, Clarity %, Lineage %, Freshness %, Prioritized %
+3. **Backlog Item health** (horizontal bar chart, 5 bars)
+   - Ownership %
+   - Acceptance Criteria coverage %
+   - Priority coverage %
+   - Task coverage % (stories with at least one child Task)
+   - Effort coverage % (Tasks with Original Estimate and Remaining Work)
    - Each bar colored red/amber/green by threshold
 
-4. **Status distribution** (donut or stacked bar)
-   - **Data source: `System.State` field of each work item.** Not the category tag.
-   - Buckets: `New`, `Active`, `Resolved`, `Closed`, `Removed`, `Other` (any state not in the first 5).
-   - Each bucket shows a count and a percentage.
-   - Section title in the HTML must be exactly: **"State distribution"** (renamed from "Status" to avoid confusion with category).
+4. **Burn-down chart**
+   - Full-width, prominent SVG chart.
+   - X-axis: last 7 days.
+   - Primary y-axis: remaining User Stories.
+   - Optional secondary label: remaining hours if effort fields exist.
+   - Draw at least two lines:
+     - **Actual remaining** (blue, solid)
+     - **Ideal burn-down** (green, dashed)
+   - If no stories have closed yet, still render a proper burn-down chart with a flat actual line and a note explaining that the line will step down as stories close.
 
-4b. **Work item type breakdown** (small horizontal bar chart, immediately under State distribution)
-   - Buckets: count of each `System.WorkItemType` value seen (e.g., `User Story`, `Task`, `Bug`, `Feature`, `Product Backlog Item`).
-   - This makes it obvious when child tasks are inflating totals.
+5. **State distribution: User Stories and Tasks**
+   - Section title must be exactly: **"State distribution: User Stories and Tasks"**.
+   - Render two side-by-side stacked bars or compact cards:
+     - User Stories: `New`, `Active`, `Closed`
+     - Tasks: `New`, `Active`, `Closed`
+   - Use the normalized state buckets above.
+   - Show counts and percentages for each bucket.
+   - This is the key section for showing the state of Tasks and User Stories within the Feature.
 
-5. **Gaps to fix** (table)
+6. **Story/task drill-down**
+   - A compact table grouped by User Story.
+   - Columns: Story ID, Story title, Story state, child Task count, Task state summary (`New / Active / Closed`), remaining hours.
+   - Link every Story ID to ADO.
+
+7. **Gaps to fix** (table)
    - Columns: Work item ID (linked to ADO), Title, Gap, Suggested action
    - Sort by severity: missing-owner first, then unclear, then lineage, then stale, then no-priority
    - If no gaps: show "🎉 No gaps detected. Backlog is healthy."
 
-6. **By category** (small horizontal bar chart)
+8. **By category** (small horizontal bar chart)
    - Count of items per `category:*` tag.
    - **Data source: the `category:*` tag** written in Step 3. Not the work item state. Not the work item type.
    - If all items end up in one category, that's a signal the classifier rules need to be tuned — surface this with a small note: "All items classified as <X>. Consider whether other categories apply."
 
-7. **Burndown** (line chart, full width)
-   - X-axis: last 7 days
-   - Y-axis: remaining stories (Total − Done)
-   - Show "Awaiting more data" message if all points are equal (first run)
-
-8. **Recently completed** (list of last 5 items moved to Done, with date)
+9. **Recently completed** (list of last 5 stories/tasks moved to Closed, with date)
    - If empty: "No items completed yet."
 
-9. **Footer**
+10. **Footer**
    - "Generated by backlog-organizer skill · <repo URL>"
    - Link: "Run again: `copilot> Run the backlog-organizer skill`"
 
@@ -162,12 +205,12 @@ After writing the file:
 ```
 ✅ Backlog organizer complete (Run #N)
 
+Feature: #<id> — <alias> - On-Call Handoff Notes
 Health score: 58/100  🟡
   Ownership:    40%  🔴
-  Clarity:      83%  🟢
-  Lineage:      100% 🟢
-  Freshness:    100% 🟢
-  Prioritized:  17%  🔴
+  AC coverage:  83%  🟢
+  Task coverage:100% 🟢
+  Effort coverage: 90% 🟢
 
 Findings written back to ADO: 9 items tagged, 9 comments added
 Dashboard: docs/dashboard.html (opened in browser)
@@ -183,6 +226,7 @@ Re-run this skill anytime to see how things have improved.
 ## Rules
 
 - **Same skill, two runs, no parameters.** Detect state from ADO, not from inputs.
+- **Feature-scoped only.** Never visualize the whole area path if a validated alias-prefixed Feature is available. The dashboard must focus on descendants of that Feature.
 - **Never destructive.** Tags and comments only.
 - **Deterministic rendering.** Given the same ADO state, produce the same dashboard. No model creativity in the HTML — use the data, render the chart.
 - **Self-contained HTML.** Must work offline, in file:// mode, screenshots cleanly.
