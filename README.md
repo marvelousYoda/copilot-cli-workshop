@@ -152,9 +152,10 @@ If you want to see hierarchical decomposition in action — useful when you're a
 Pick the story for F6 (WorkIQ import). Decompose it into 3–5 implementation tasks
 in ADO, linked as children of the story. Each task should be small enough to do
 in 30 minutes. Don't assign them, and pin them under the same area path as the parent.
+For each Task, set Effort (Hours): Original Estimate and Remaining to one of 1, 3, or 5.
 ```
 
-> **Note:** We intentionally don't decompose every story upfront — it would flood the dashboard. Decompose **on demand**, only when you're about to work on something. This is closer to how real teams operate.
+> **Effort sizing rule of thumb:** use **1 hour** for a small route/query change, **3 hours** for normal UI + test work, and **5 hours** for larger integration work like WorkIQ import. We intentionally don't decompose every story upfront — it would flood the dashboard. Decompose **on demand**, only when you're about to work on something. This is closer to how real teams operate.
 
 ### Phase 3 — Visualize the backlog (Run #1) *(7 min)*
 
