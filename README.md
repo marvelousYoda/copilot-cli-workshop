@@ -106,6 +106,11 @@ Find any stories whose title mentions "workiq" and tag them "needs-design".
 
 The point: **MCP = Copilot CLI can do anything ADO's API can do, in plain English.**
 
+> **Area-path scoping is automatic.** `.github/copilot-instructions.md` tells Copilot CLI to
+> scope every ADO read/write to your `$env:ADO_AREA_PATH`, so even freeform prompts like the
+> ones above won't touch other teams' items on a shared project. (Loaded at startup — if you
+> edit it, `/restart`.) You can still name the area path explicitly in a prompt if you want.
+
 #### Power-user prompt (optional, 1 min)
 
 If you want to see hierarchical decomposition in action — useful when you're about to pick up a story and want it broken into half-hour chunks:
@@ -312,6 +317,8 @@ What changed in this repo in the last 24 hours?
 ├── docs/                         # backlog-organizer writes dashboard.html here
 ├── .workshop/                    # spec-to-tasks writes backlog.json here
 ├── .mcp.json                     # ADO MCP server config (edit org)
+├── .github/
+│   └── copilot-instructions.md   # Auto-loaded rules (scopes ADO work to your area path)
 ├── .copilot/
 │   └── skills/
 │       ├── spec-to-tasks.md
