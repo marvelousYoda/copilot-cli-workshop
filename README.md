@@ -179,6 +179,8 @@ Run the backlog-organizer skill
 - New / Active / Closed state for User Stories and Tasks under your Feature
 - Any gaps the organizer found, without mixing in other participants' backlog items
 
+The dashboard is deterministic for the same ADO state: it reads only descendants of your alias-prefixed Feature, sorts items by ID, uses fixed health formulas, and avoids tag-only or area-wide fallbacks.
+
 Click into a flagged story in ADO — you'll see the skill's comment explaining what it found.
 
 ### Phase 4 — Build the prototype *(20 min)*

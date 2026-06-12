@@ -35,6 +35,34 @@ Both runs use **exactly the same skill** with no parameters. The dashboard adapt
   - Exclude all other `workshop` items in the same area path, even if they match tags or titles.
 - Fetch each descendant's full fields: title, description, AC, state, assignee, priority, tags, parent link, created date, changed date, linked PRs, Original Estimate, Remaining Work, and Completed Work.
 
+**Deterministic ADO query contract:**
+- Prefer Azure DevOps MCP tools when available. If MCP hierarchy queries are unreliable, use Azure CLI (`az boards query` and `az boards work-item show`) with the same constraints.
+- Do **not** query by tag alone for the dashboard. Tags are useful for classification, but the dashboard scope is the validated Feature hierarchy.
+- If using WIQL, use this deterministic sequence:
+  1. Fetch the parent Feature by ID.
+  2. Query direct User Story / Product Backlog Item children with `[System.Parent] = <featureId>` and `[System.AreaPath] UNDER '<featureAreaPath>'`.
+  3. Query direct Task children with `[System.Parent] IN (<storyIds>)` and the same area-path constraint.
+  4. Fetch full fields for exactly those story/task IDs.
+- Sort User Stories by numeric `System.Id` ascending. Sort Tasks by numeric `System.Id` ascending within each parent story.
+- Required fields:
+  - `System.Id`
+  - `System.Title`
+  - `System.WorkItemType`
+  - `System.State`
+  - `System.AssignedTo`
+  - `System.AreaPath`
+  - `System.Tags`
+  - `System.Description`
+  - `System.Parent`
+  - `System.CreatedDate`
+  - `System.ChangedDate`
+  - `Microsoft.VSTS.Common.Priority`
+  - `Microsoft.VSTS.Common.AcceptanceCriteria`
+  - `Microsoft.VSTS.Scheduling.OriginalEstimate`
+  - `Microsoft.VSTS.Scheduling.RemainingWork`
+  - `Microsoft.VSTS.Scheduling.CompletedWork`
+- If no story IDs are found under the Feature, render an empty-state dashboard for that Feature instead of falling back to area-path or tag-scoped items.
+
 ### Step 2 — Analyze each item against these checks
 
 For each work item, evaluate:
@@ -98,6 +126,18 @@ Also compute:
 - **Linked PRs**: count of work items with a linked PR
 - **Burn-down points**: an array of `{date, remainingStories, remainingHours}` pairs over the last 7 days. The chart should show remaining stories as the primary line and remaining hours as a secondary line if effort data exists.
 
+**Deterministic metric formulas:**
+- `Ownership %` = assigned descendants / all descendants.
+- `Acceptance Criteria coverage %` = stories with non-empty `Microsoft.VSTS.Common.AcceptanceCriteria` / total stories.
+- `Priority coverage %` = stories with `Microsoft.VSTS.Common.Priority` or a `priority:P0|P1|P2` tag / total stories.
+- `Task coverage %` = stories with at least one child Task / total stories.
+- `Effort coverage %` = Tasks with both `OriginalEstimate` and `RemainingWork` / total Tasks.
+- `Health score` = rounded average of Ownership, Acceptance Criteria coverage, Priority coverage, Task coverage, and Effort coverage.
+- `Remaining hours` = sum of `Microsoft.VSTS.Scheduling.RemainingWork` across Tasks. Treat missing values as 0 for totals but count them as missing for Effort coverage.
+- `Original estimate` = sum of `Microsoft.VSTS.Scheduling.OriginalEstimate` across Tasks.
+- `Completed work` = sum of `Microsoft.VSTS.Scheduling.CompletedWork` across Tasks. Treat missing values as 0.
+- `Open gaps` = count of distinct work items with at least one active finding, not count of individual finding rows.
+
 **State normalization:**
 - `New`, `Proposed`, `To Do` → `New`
 - `Active`, `In Progress`, `Committed`, `Doing` → `Active`
@@ -131,6 +171,18 @@ Write a single self-contained HTML file to `docs/dashboard.html` (create folder 
 - Keep the dashboard **Feature-scoped**. The header must show the Feature ID, Feature title, alias, and area path so the audience can see it is not mixing participants.
 - Use the phrase **"Backlog Item health"** in the hero/header area.
 - Prefer visual cards and SVG charts over large tables. Tables are allowed for detailed story/task drill-down.
+- The dashboard must be deterministic for the same ADO state:
+  - Same section order.
+  - Same color thresholds.
+  - Same item sorting.
+  - No invented summaries, slogans, random colors, or model-generated data.
+  - The only expected changing values are run number, generated timestamp, and ADO data changes.
+- Use these colors consistently:
+  - Green: `#22c55e`
+  - Amber: `#f59e0b`
+  - Red: `#ef4444`
+  - Blue actual burn-down line: `#60a5fa`
+  - Muted text: `#94a3b8` or similar accessible slate.
 
 ### Dashboard sections (in this order)
 
@@ -164,6 +216,8 @@ Write a single self-contained HTML file to `docs/dashboard.html` (create folder 
      - **Actual remaining** (blue, solid)
      - **Ideal burn-down** (green, dashed)
    - If no stories have closed yet, still render a proper burn-down chart with a flat actual line and a note explaining that the line will step down as stories close.
+   - Always show labels for current remaining stories and current remaining hours.
+   - Never render a generic "Awaiting more data" placeholder instead of the chart.
 
 5. **State distribution: User Stories and Tasks**
    - Section title must be exactly: **"State distribution: User Stories and Tasks"**.
@@ -178,6 +232,7 @@ Write a single self-contained HTML file to `docs/dashboard.html` (create folder 
    - A compact table grouped by User Story.
    - Columns: Story ID, Story title, Story state, child Task count, Task state summary (`New / Active / Closed`), remaining hours.
    - Link every Story ID to ADO.
+   - Sort by Story ID ascending.
 
 7. **Gaps to fix** (table)
    - Columns: Work item ID (linked to ADO), Title, Gap, Suggested action
@@ -227,6 +282,7 @@ Re-run this skill anytime to see how things have improved.
 
 - **Same skill, two runs, no parameters.** Detect state from ADO, not from inputs.
 - **Feature-scoped only.** Never visualize the whole area path if a validated alias-prefixed Feature is available. The dashboard must focus on descendants of that Feature.
+- **No tag-only fallback.** Do not fall back to `[System.Tags] CONTAINS 'workshop'` if Feature descendants are available or expected.
 - **Never destructive.** Tags and comments only.
 - **Deterministic rendering.** Given the same ADO state, produce the same dashboard. No model creativity in the HTML — use the data, render the chart.
 - **Self-contained HTML.** Must work offline, in file:// mode, screenshots cleanly.
