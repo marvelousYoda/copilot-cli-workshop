@@ -56,7 +56,7 @@ Check "Copilot CLI authenticated" {
         # Treat hang as "unknown" rather than failing — common in script contexts
         "skipped (timed out — run 'copilot auth status' manually to confirm)"
     }
-} "Run: copilot auth login"
+} "Run: copilot login"
 
 Check "Port 3000 free" {
     $inUse = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue

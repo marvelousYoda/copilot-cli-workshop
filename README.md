@@ -57,8 +57,14 @@ Copy-paste these into Copilot CLI as you go. Brackets like `<ID>` mark where to 
 The spec is **ready to use**. Skim it so you know what you're building:
 
 ```powershell
-code spec/oncall-handoff-notes.md
+!code spec/oncall-handoff-notes.md
 ```
+
+> **What's the  "!" for?** Inside Copilot CLI, anything you type is normally sent to the agent as a prompt. Prefixing a line with `!` tells Copilot CLI to **run it directly in your shell** instead. So `!code spec/oncall-handoff-notes.md` launches VS Code, while typing the same line *without* the `!` would just hand the text to the agent to interpret.
+>
+> **Try it both ways** to see the difference in action: first type `code spec/oncall-handoff-notes.md` (no `!`) and watch the agent respond, then run `!code spec/oncall-handoff-notes.md` and watch VS Code open.
+>
+> Sometimes, this is useful when you don't want to exit out of your session or open another shell window.
 
 Then generate the task list:
 
@@ -312,6 +318,7 @@ npm install
 | ADO MCP can't see my project | Edit `.copilot/mcp.json` with your org/project (or just re-run `.\configure.ps1`), restart Copilot CLI |
 | I opened a new terminal and my work items go to the wrong area | ADO env vars are session-scoped. Re-run `.\configure.ps1` in the new terminal, **then** restart `copilot`. |
 | Tests hang | Make sure you're on Node 20+: `node --version` |
+| `npm install` fails building `better-sqlite3` (`gyp ERR! find Python`) | `better-sqlite3` is a native module that uses a **prebuilt binary** for your Node version — no Python/compiler needed. The error means npm couldn't find a prebuilt binary and fell back to compiling from source. Fix: use a Node version with prebuilds. This repo pins `better-sqlite3@^12`, which has prebuilds through **Node 24**. If you're on an even newer Node, install **Node 20 or 22 LTS** (`node --version` to check), delete `node_modules`, and re-run `npm install`. |
 | Dashboard looks empty | You haven't run `backlog-to-ado` yet, or your ADO items aren't tagged `workshop` |
 | WorkIQ import returns nothing | The `import:workiq` script will use mock data automatically. That's fine for the workshop. |
 | I edited a skill but my changes aren't taking effect | **Restart Copilot CLI.** Skills are loaded once at startup. `exit` then `copilot` to re-launch. |
