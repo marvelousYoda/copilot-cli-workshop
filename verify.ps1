@@ -107,10 +107,10 @@ Check "spec file present" {
     if (Test-Path ".\spec\oncall-handoff-notes.md") { "found" } else { $null }
 } "Make sure you cloned the full repo. Spec lives at spec/oncall-handoff-notes.md."
 
-Check "all 5 skills present" {
-    $expected = @("spec-to-tasks","backlog-to-ado","backlog-organizer","pr-review","pr-summarizer")
+Check "all 6 skills present" {
+    $expected = @("spec-to-tasks","backlog-to-ado","backlog-to-tasks","backlog-organizer","pr-review","pr-summarizer")
     $missing = $expected | Where-Object { -not (Test-Path ".\.github\skills\$_\SKILL.md") }
-    if ($missing.Count -eq 0) { "5/5" } else { $null }
+    if ($missing.Count -eq 0) { "6/6" } else { $null }
 } "Re-clone the repo. Skills should be in .github/skills/<skill-name>/SKILL.md."
 
 Write-Host "`n=== Summary ===`n" -ForegroundColor Cyan

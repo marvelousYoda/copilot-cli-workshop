@@ -23,7 +23,7 @@ dir spec
 dir .github\skills
 ```
 
-You should see `spec/oncall-handoff-notes.md` and five skills under `.github/skills`.
+You should see `spec/oncall-handoff-notes.md` and six skills under `.github/skills`.
 
 **Configure ADO** (sets env vars + writes `.mcp.json` in one shot):
 
@@ -116,7 +116,17 @@ Run the backlog-to-ado skill using this parent feature: <FEATURE_URL>
 
 **Output:** User Stories appear as children of your manually created Feature, all tagged `workshop`.
 
-### Phase 2.5 — Poke the backlog with freeform MCP *(6 min)*
+### Phase 2.5 — Decompose stories into assigned Tasks *(3 min)*
+
+Run one more skill to create the implementation Tasks, assign them to you, and set Effort (Hours) using the workshop's 1/3/5-hour sizing convention:
+
+```
+Run the backlog-to-tasks skill
+```
+
+**Output:** Tasks appear under the User Stories, assigned to you, with **Original Estimate** and **Remaining** set to 1, 3, or 5 hours.
+
+### Phase 2.6 — Poke the backlog with freeform MCP *(6 min)*
 
 This is where you *feel* what ADO MCP is. Try a few of these, one at a time:
 
@@ -146,16 +156,16 @@ The point: **MCP = Copilot CLI can do anything ADO's API can do, in plain Englis
 
 #### Power-user prompt (optional, 1 min)
 
-If you want to see hierarchical decomposition in action — useful when you're about to pick up a story and want it broken into half-hour chunks:
+If you want to see hierarchical decomposition in action for a custom or newly imagined story:
 
 ```
-Pick the story for F6 (WorkIQ import). Decompose it into 3–5 implementation tasks
-in ADO, linked as children of the story. Each task should be small enough to do
-in 30 minutes. Don't assign them, and pin them under the same area path as the parent.
+Pick story #<ID>. Decompose it into 3–5 implementation tasks
+in ADO, linked as children of the story. Each task should be small enough to do.
+Assign them to me, and pin them under the same area path as the parent.
 For each Task, set Effort (Hours): Original Estimate and Remaining to one of 1, 3, or 5.
 ```
 
-> **Effort sizing rule of thumb:** use **1 hour** for a small route/query change, **3 hours** for normal UI + test work, and **5 hours** for larger integration work like WorkIQ import. We intentionally don't decompose every story upfront — it would flood the dashboard. Decompose **on demand**, only when you're about to work on something. This is closer to how real teams operate.
+> **Effort sizing rule of thumb:** use **1 hour** for a small route/query change, **3 hours** for normal UI + test work, and **5 hours** for larger integration work like WorkIQ import. The `backlog-to-tasks` skill applies this automatically for the standard workshop backlog.
 
 ### Phase 3 — Visualize the backlog (Run #1) *(7 min)*
 
@@ -300,13 +310,14 @@ Same skill, run twice. That's the lesson.
 |---|---|---|
 | `spec-to-tasks` | Reads the spec → writes `.workshop/backlog.json` | No (file write only) |
 | `backlog-to-ado` | Reads the JSON → creates ADO User Stories under your manual Feature | Yes (creates ADO items, idempotent) |
+| `backlog-to-tasks` | Creates child Tasks, assigns them, and sets 1/3/5-hour Effort | Yes (creates/updates Task items, idempotent) |
 | `backlog-organizer` | Analyzes the ADO backlog → tags gaps, adds comments, renders dashboard | Yes (tags + comments only; never changes state/assignee) |
 | `pr-review` | Reviews your PR against team standards | Yes (posts review on PR) |
 | `pr-summarizer` | Generates a clean PR description from the diff | Yes (updates PR description) |
 
 All skills live in `.github/skills/<skill-name>/SKILL.md` and are version-controlled with the repo. Share them with your team by sharing the repo.
 
-**What is a skill?** A skill is a small Markdown instruction pack that teaches Copilot CLI how to do one repeatable workflow. For example, `.github/skills/backlog-to-ado/SKILL.md` tells Copilot how to take `.workshop/backlog.json`, require your ADO Feature link, and create correctly scoped child User Stories.
+**What is a skill?** A skill is a small Markdown instruction pack that teaches Copilot CLI how to do one repeatable workflow. For example, `.github/skills/backlog-to-tasks/SKILL.md` tells Copilot how to create child Tasks, assign them, and set Effort without a pile of follow-up prompts.
 
 ---
 
@@ -371,6 +382,7 @@ What changed in this repo in the last 24 hours?
 │   └── skills/
 │       ├── spec-to-tasks/SKILL.md
 │       ├── backlog-to-ado/SKILL.md
+│       ├── backlog-to-tasks/SKILL.md
 │       ├── backlog-organizer/SKILL.md
 │       ├── pr-review/SKILL.md
 │       └── pr-summarizer/SKILL.md
