@@ -86,13 +86,22 @@ Run the backlog-to-ado skill
 
 ### Phase 2.5 — Poke the backlog with freeform MCP *(6 min)*
 
-This is where you *feel* what ADO MCP is. Try a few of these:
+This is where you *feel* what ADO MCP is. Try a few of these, one at a time:
 
 ```
-> List all workshop-tagged work items in my project, grouped by state.
-> Show me the top 3 stories by priority with their acceptance criteria.
-> Add a comment to story #<ID>: "let's discuss in standup".
-> Find any stories whose title mentions "workiq" and tag them "needs-design".
+List all workshop-tagged work items in my project, grouped by state.
+```
+
+```
+Show me the top 3 stories by priority with their acceptance criteria.
+```
+
+```
+Add a comment to story #<ID>: "let's discuss in standup".
+```
+
+```
+Find any stories whose title mentions "workiq" and tag them "needs-design".
 ```
 
 The point: **MCP = Copilot CLI can do anything ADO's API can do, in plain English.**
@@ -102,9 +111,9 @@ The point: **MCP = Copilot CLI can do anything ADO's API can do, in plain Englis
 If you want to see hierarchical decomposition in action — useful when you're about to pick up a story and want it broken into half-hour chunks:
 
 ```
-> Pick the story for F6 (WorkIQ import). Decompose it into 3–5 implementation tasks
-> in ADO, linked as children of the story. Each task should be small enough to do
-> in 30 minutes. Don't assign them, and pin them under the same area path as the parent.
+Pick the story for F6 (WorkIQ import). Decompose it into 3–5 implementation tasks
+in ADO, linked as children of the story. Each task should be small enough to do
+in 30 minutes. Don't assign them, and pin them under the same area path as the parent.
 ```
 
 > **Note:** We intentionally don't decompose every story upfront — it would flood the dashboard. Decompose **on demand**, only when you're about to work on something. This is closer to how real teams operate.
@@ -128,16 +137,19 @@ Click into a flagged story in ADO — you'll see the skill's comment explaining 
 Pick one story (preferably your F7 or the F6 WorkIQ import — those are the most interesting):
 
 ```
-> Show me ready stories in my ADO project that are not assigned.
-> Assign story #<ID> to me, move it to In Progress, and tell me what its AC are.
+Show me ready stories in my ADO project that are not assigned.
+```
+
+```
+Assign story #<ID> to me, move it to In Progress, and tell me what its AC are.
 ```
 
 Then build:
 
 ```
-> Implement ADO story #<ID> in this repo. Use Express and better-sqlite3.
-> Add the route(s), a minimal HTML view if needed, and at least one Jest test in tests/.
-> Run the tests when done.
+Implement ADO story #<ID> in this repo. Use Express and better-sqlite3.
+Add the route(s), a minimal HTML view if needed, and at least one Jest test in the tests/ directory.
+Run the tests when done.
 ```
 
 Iterate with Copilot CLI as it works.
@@ -192,7 +204,7 @@ az boards work-item update --id <ID> --state "Active"
 Then ask Copilot CLI the same thing:
 
 ```
-> Show me work item <ID> and move it to Active.
+Show me work item <ID> and move it to Active.
 ```
 
 Same result. MCP just removes the need to remember flags.
@@ -202,7 +214,7 @@ Same result. MCP just removes the need to remember flags.
 Open the PR:
 
 ```
-> Create a branch for story #<ID>, commit my changes, push it, and open a PR in ADO linked to that work item.
+Create a branch for story #<ID>, commit my changes, push it, and open a PR in ADO linked to that work item.
 ```
 
 Then run both review skills:
@@ -248,20 +260,42 @@ All skills live in `.copilot/skills/` and are version-controlled with the repo. 
 
 Use these anytime — no skill needed.
 
+### Read
+
 ```
-# Read
-> List my work items in priority order
-> Show me PRs raised this week in this repo
-> Get the description and AC of story #<ID>
+List my work items in priority order
+```
 
-# Write
-> Add a comment to #<ID>: <text>
-> Tag stories matching <query> with <tag>
-> Link story #<ID> to PR #<PR-ID>
+```
+Show me PRs raised this week in this repo
+```
 
-# Reflect
-> Summarize what's blocking story #<ID> based on its comments
-> What changed in this repo in the last 24 hours?
+```
+Get the description and AC of story #<ID>
+```
+
+### Write
+
+```
+Add a comment to #<ID>: <text>
+```
+
+```
+Tag stories matching <query> with <tag>
+```
+
+```
+Link story #<ID> to PR #<PR-ID>
+```
+
+### Reflect
+
+```
+Summarize what's blocking story #<ID> based on its comments
+```
+
+```
+What changed in this repo in the last 24 hours?
 ```
 
 ---
@@ -312,7 +346,7 @@ npm install
 
 | Symptom | Fix |
 |---|---|
-| `verify.ps1` fails on Copilot CLI | `npm install -g @github/copilot` then `copilot auth login` |
+| `verify.ps1` fails on Copilot CLI | `npm install -g @github/copilot` then `copilot login` |
 | `verify.ps1` fails on `az` | `az login` and `az extension add --name azure-devops` |
 | Port 3000 in use | `$env:PORT=3001; npm start` |
 | ADO MCP can't see my project | Edit `.mcp.json` with your org (or just re-run `.\configure.ps1`), restart Copilot CLI |
@@ -321,7 +355,7 @@ npm install
 | `npm install` fails building `better-sqlite3` (`gyp ERR! find Python`) | `better-sqlite3` is a native module that uses a **prebuilt binary** for your Node version — no Python/compiler needed. The error means npm couldn't find a prebuilt binary and fell back to compiling from source. Fix: use a Node version with prebuilds. This repo pins `better-sqlite3@^12`, which has prebuilds through **Node 24**. If you're on an even newer Node, install **Node 20 or 22 LTS** (`node --version` to check), delete `node_modules`, and re-run `npm install`. |
 | Dashboard looks empty | You haven't run `backlog-to-ado` yet, or your ADO items aren't tagged `workshop` |
 | WorkIQ import returns nothing | The `import:workiq` script will use mock data automatically. That's fine for the workshop. |
-| I edited a skill but my changes aren't taking effect | **Restart Copilot CLI.** Skills are loaded once at startup. `exit` then `copilot` to re-launch. |
+| I edited a skill but my changes aren't taking effect | **Restart Copilot CLI.** Skills are loaded once at startup. Run `/restart` to reload while keeping your current session, or `exit` then `copilot` to re-launch. **Tip:** when you `exit`, the CLI prints a session ID with a `copilot --resume <id>` command so you can pick the conversation back up where you left off. |
 | Dashboard didn't regenerate after re-running | Delete `docs/dashboard.html` first, then re-run the skill. Browsers also cache — hard-refresh with `Ctrl+F5`. |
 
 ---
