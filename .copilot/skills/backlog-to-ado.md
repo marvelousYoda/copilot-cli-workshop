@@ -13,7 +13,7 @@ You take a generated backlog and push it into Azure DevOps as real work items, u
 
 ## Prerequisites
 - The ADO MCP server must be available. If it isn't, stop and tell the user:
-  > `❌ ADO MCP server not available. Check .copilot/mcp.json and restart Copilot CLI.`
+  > `❌ ADO MCP server not available. Check .mcp.json and restart Copilot CLI.`
 - The backlog JSON file must exist. If it doesn't, stop and tell the user:
   > `❌ No backlog found at .workshop/backlog.json. Run the spec-to-tasks skill first.`
 - **Area path safeguard**: read the `ADO_AREA_PATH` environment variable.

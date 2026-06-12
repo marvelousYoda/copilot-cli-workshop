@@ -18,7 +18,7 @@ Both runs use **exactly the same skill** with no parameters. The dashboard adapt
 
 ## Prerequisites
 - The ADO MCP server must be available. If it isn't, stop and tell the user:
-  > `❌ ADO MCP server not available. Check .copilot/mcp.json and restart Copilot CLI.`
+  > `❌ ADO MCP server not available. Check .mcp.json and restart Copilot CLI.`
 
 ## What to do
 

@@ -1,6 +1,6 @@
 # configure.ps1
 # One-shot config for the workshop. Sets ADO env vars for THIS shell session and
-# writes them into .copilot/mcp.json so the ADO MCP server can reach your project.
+# writes them into .mcp.json so the ADO MCP server can reach your project.
 #
 # Usage:
 #   .\configure.ps1                                         # interactive (prompts for values)
@@ -8,7 +8,7 @@
 #   .\configure.ps1 -Org "myorg" -Project "MyProject" -AreaPath "MyProject\Workshop"
 #
 # This must be re-run each time you open a new PowerShell window (env vars are
-# scoped to the shell session). The .copilot/mcp.json edit is persistent.
+# scoped to the shell session). The .mcp.json edit is persistent.
 
 param(
     [string]$Org,
@@ -54,10 +54,12 @@ $env:ADO_PROJECT = $Project
 $env:ADO_AREA_PATH = $AreaPath
 Write-Host "[ OK ] Set `$env:ADO_ORG, `$env:ADO_PROJECT, `$env:ADO_AREA_PATH for this shell" -ForegroundColor Green
 
-# Step 2: rewrite .copilot/mcp.json with the chosen org/project
-$mcpPath = ".\.copilot\mcp.json"
+# Step 2: rewrite .mcp.json with the chosen org
+# Copilot CLI loads workspace MCP config from .mcp.json (or .github/mcp.json).
+# The org is passed as a positional arg to the server.
+$mcpPath = ".\.mcp.json"
 if (-not (Test-Path $mcpPath)) {
-    Write-Host "[FAIL] .copilot\mcp.json not found. Are you in the workshop repo root?" -ForegroundColor Red
+    Write-Host "[FAIL] .mcp.json not found. Are you in the workshop repo root?" -ForegroundColor Red
     exit 1
 }
 $mcp = Get-Content $mcpPath -Raw

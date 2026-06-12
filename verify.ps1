@@ -56,7 +56,7 @@ Check "Copilot CLI authenticated" {
         # Treat hang as "unknown" rather than failing — common in script contexts
         "skipped (timed out — run 'copilot auth status' manually to confirm)"
     }
-} "Run: copilot auth login"
+} "Run: copilot login"
 
 Check "Port 3000 free" {
     $inUse = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue
@@ -81,8 +81,8 @@ Check "ADO project reachable" {
     return $null
 } "Set `$env:ADO_ORG and `$env:ADO_PROJECT, then sign in to ADO in your browser."
 
-Check ".copilot/mcp.json present" {
-    if (Test-Path ".\.copilot\mcp.json") { "found" } else { $null }
+Check ".mcp.json present" {
+    if (Test-Path ".\.mcp.json") { "found" } else { $null }
 } "You may be in the wrong folder. cd into the cloned workshop repo."
 
 Check "npm install completed" {
