@@ -108,10 +108,10 @@ Check "spec file present" {
 } "Make sure you cloned the full repo. Spec lives at spec/oncall-handoff-notes.md."
 
 Check "all 5 skills present" {
-    $expected = @("spec-to-tasks.md","backlog-to-ado.md","backlog-organizer.md","pr-review.md","pr-summarizer.md")
-    $missing = $expected | Where-Object { -not (Test-Path ".\.copilot\skills\$_") }
+    $expected = @("spec-to-tasks","backlog-to-ado","backlog-organizer","pr-review","pr-summarizer")
+    $missing = $expected | Where-Object { -not (Test-Path ".\.github\skills\$_\SKILL.md") }
     if ($missing.Count -eq 0) { "5/5" } else { $null }
-} "Re-clone the repo. Skills should be in .copilot/skills/."
+} "Re-clone the repo. Skills should be in .github/skills/<skill-name>/SKILL.md."
 
 Write-Host "`n=== Summary ===`n" -ForegroundColor Cyan
 $pass = ($checks | Where-Object Status -eq "PASS").Count

@@ -156,8 +156,8 @@ Once a handoff is written, the on-call needs to get it into Teams, an email, or 
 ## How this spec becomes a backlog
 
 The `spec-to-tasks` skill will read this file and produce:
-- **1 Epic** — "On-Call Handoff Notes MVP"
+- **1 parent Feature metadata object** — "On-Call Handoff Notes MVP"
 - **8 User Stories** — one per feature (F1–F8)
 - Each story will have a title, description, and 2–4 acceptance criteria
 
-You'll review them, then `backlog-to-ado` pushes them into your ADO project.
+You'll review them, manually create your alias-prefixed ADO Feature, then `backlog-to-ado` pushes the stories under that Feature.

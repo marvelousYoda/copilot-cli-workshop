@@ -15,6 +15,16 @@ npm install
 npm test                # should pass (2 smoke tests)
 ```
 
+Before starting the lab, make sure you are in the cloned repo directory and can find the two key workshop inputs:
+
+```powershell
+pwd
+dir spec
+dir .github\skills
+```
+
+You should see `spec/oncall-handoff-notes.md` and five skills under `.github/skills`.
+
 **Configure ADO** (sets env vars + writes `.mcp.json` in one shot):
 
 ```powershell
@@ -76,13 +86,35 @@ Run the spec-to-tasks skill on spec/oncall-handoff-notes.md
 
 > *Optional (if you have time): the spec has a few `<OPTIONAL EDIT>` markers where you can replace example content with your own voice. Skip them if you're pressed for time — the spec works as-is.*
 
-### Phase 2 — Generate the backlog in ADO *(7 min)*
+### Phase 2 — Create your ADO Feature, then generate stories *(7 min)*
+
+In the video/demo, create the parent Feature manually in ADO first. This makes the shared project safer and easier to explain because everyone can see their own clearly named container before Copilot writes anything.
+
+Create a **Feature** named:
+
+```text
+<alias> - On-Call Handoff Notes
+```
+
+Example:
+
+```text
+shaygupt - On-Call Handoff Notes
+```
+
+Copy the Feature URL from ADO. It should look like:
+
+```text
+https://o365exchange.visualstudio.com/Enterprise%20Cloud/_workitems/edit/<FEATURE_ID>
+```
+
+Then ask the skill to create the backlog under that Feature:
 
 ```
-Run the backlog-to-ado skill
+Run the backlog-to-ado skill using this parent feature: <FEATURE_URL>
 ```
 
-**Output:** an Epic + 6–7 User Stories appear in your ADO project, all tagged `workshop`.
+**Output:** User Stories appear as children of your manually created Feature, all tagged `workshop`.
 
 ### Phase 2.5 — Poke the backlog with freeform MCP *(6 min)*
 
@@ -107,9 +139,10 @@ Find any stories whose title mentions "workiq" and tag them "needs-design".
 The point: **MCP = Copilot CLI can do anything ADO's API can do, in plain English.**
 
 > **Area-path scoping is automatic.** `.github/copilot-instructions.md` tells Copilot CLI to
-> scope every ADO read/write to your `$env:ADO_AREA_PATH`, so even freeform prompts like the
-> ones above won't touch other teams' items on a shared project. (Loaded at startup — if you
-> edit it, `/restart`.) You can still name the area path explicitly in a prompt if you want.
+> scope ADO read/write work to your `$env:ADO_AREA_PATH` or to the validated alias-prefixed
+> Feature link you provided in Phase 2, so even freeform prompts like the ones above won't
+> touch other teams' items on a shared project. (Loaded at startup — if you edit it,
+> `/restart`.) You can still name the area path explicitly in a prompt if you want.
 
 #### Power-user prompt (optional, 1 min)
 
@@ -265,12 +298,14 @@ Same skill, run twice. That's the lesson.
 | Skill | What it does | Mutates state? |
 |---|---|---|
 | `spec-to-tasks` | Reads the spec → writes `.workshop/backlog.json` | No (file write only) |
-| `backlog-to-ado` | Reads the JSON → creates ADO Epic + Stories | Yes (creates ADO items, idempotent) |
+| `backlog-to-ado` | Reads the JSON → creates ADO User Stories under your manual Feature | Yes (creates ADO items, idempotent) |
 | `backlog-organizer` | Analyzes the ADO backlog → tags gaps, adds comments, renders dashboard | Yes (tags + comments only; never changes state/assignee) |
 | `pr-review` | Reviews your PR against team standards | Yes (posts review on PR) |
 | `pr-summarizer` | Generates a clean PR description from the diff | Yes (updates PR description) |
 
-All skills live in `.copilot/skills/` and are version-controlled with the repo. Share them with your team by sharing the repo.
+All skills live in `.github/skills/<skill-name>/SKILL.md` and are version-controlled with the repo. Share them with your team by sharing the repo.
+
+**What is a skill?** A skill is a small Markdown instruction pack that teaches Copilot CLI how to do one repeatable workflow. For example, `.github/skills/backlog-to-ado/SKILL.md` tells Copilot how to take `.workshop/backlog.json`, require your ADO Feature link, and create correctly scoped child User Stories.
 
 ---
 
@@ -331,14 +366,13 @@ What changed in this repo in the last 24 hours?
 ├── .workshop/                    # spec-to-tasks writes backlog.json here
 ├── .mcp.json                     # ADO MCP server config (edit org)
 ├── .github/
-│   └── copilot-instructions.md   # Auto-loaded rules (scopes ADO work to your area path)
-├── .copilot/
+│   ├── copilot-instructions.md   # Auto-loaded rules (scopes ADO work to your area path)
 │   └── skills/
-│       ├── spec-to-tasks.md
-│       ├── backlog-to-ado.md
-│       ├── backlog-organizer.md
-│       ├── pr-review.md
-│       └── pr-summarizer.md
+│       ├── spec-to-tasks/SKILL.md
+│       ├── backlog-to-ado/SKILL.md
+│       ├── backlog-organizer/SKILL.md
+│       ├── pr-review/SKILL.md
+│       └── pr-summarizer/SKILL.md
 ├── verify.ps1                    # Pre-flight env check
 ├── package.json
 └── README.md                     # You are here
@@ -375,7 +409,7 @@ npm install
 | `npm install` fails building `better-sqlite3` (`gyp ERR! find Python`) | `better-sqlite3` is a native module that uses a **prebuilt binary** for your Node version — no Python/compiler needed. The error means npm couldn't find a prebuilt binary and fell back to compiling from source. Fix: use a Node version with prebuilds. This repo pins `better-sqlite3@^12`, which has prebuilds through **Node 24**. If you're on an even newer Node, install **Node 20 or 22 LTS** (`node --version` to check), delete `node_modules`, and re-run `npm install`. |
 | Dashboard looks empty | You haven't run `backlog-to-ado` yet, or your ADO items aren't tagged `workshop` |
 | WorkIQ import returns nothing | The `import:workiq` script will use mock data automatically. That's fine for the workshop. |
-| I edited a skill but my changes aren't taking effect | **Restart Copilot CLI.** Skills are loaded once at startup. Run `/restart` to reload while keeping your current session, or `exit` then `copilot` to re-launch. **Tip:** when you `exit`, the CLI prints a session ID with a `copilot --resume <id>` command so you can pick the conversation back up where you left off. |
+| I edited a skill but my changes aren't taking effect | **Reload skills.** Run `/skills reload`, or run `/restart` to reload the whole CLI while keeping your current session. **Tip:** when you `exit`, the CLI prints a session ID with a `copilot --resume <id>` command so you can pick the conversation back up where you left off. |
 | Dashboard didn't regenerate after re-running | Delete `docs/dashboard.html` first, then re-run the skill. Browsers also cache — hard-refresh with `Ctrl+F5`. |
 
 ---
@@ -384,5 +418,5 @@ npm install
 
 - **Fork this repo** for your team
 - **Edit the spec** to describe your real product
-- **Tweak the skills** in `.copilot/skills/` — they're just markdown, version-controlled with your code
+- **Tweak the skills** in `.github/skills/` — they're just markdown, version-controlled with your code
 - **Add your own skills** — a skill is a markdown file with a `name` and `description`. Copilot CLI will discover them automatically.

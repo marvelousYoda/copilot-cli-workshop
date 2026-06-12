@@ -35,7 +35,7 @@ For each work item, evaluate:
 |---|---|---|
 | **Missing owner** | `assignedTo` is empty AND state is not `New` | 🔴 `gap:missing-owner` |
 | **Unclear task** | description is shorter than 40 chars, OR acceptance criteria is empty, OR title matches vague patterns (`/fix stuff/i`, `/misc/i`, `/tbd/i`) | 🟡 `gap:unclear` |
-| **Ambiguous lineage** | story has no parent epic, OR epic has zero child stories | 🟡 `gap:lineage` |
+| **Ambiguous lineage** | story has no parent Feature/Epic, OR parent Feature/Epic has zero child stories | 🟡 `gap:lineage` |
 | **Stale** | `changedDate` is more than 14 days old AND state is `Active` or `New` | 🟠 `gap:stale` |
 | **Missing priority** | priority field is empty or `4` (lowest/default) AND has no `priority:*` tag | 🟡 `gap:no-priority` |
 | **Suggested priority** | analyze title/description against keywords: `block`, `customer`, `incident`, `oncall`, `data loss`, `security` → suggest `P0`. Other infrastructure/UX → `P1`. Cosmetic → `P2`. | adds `suggest:P0` (etc.) |

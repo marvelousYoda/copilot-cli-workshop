@@ -1,6 +1,6 @@
 ---
 name: spec-to-tasks
-description: Reads a product spec markdown file and produces a structured backlog (epic + user stories with acceptance criteria) as a JSON file ready for backlog-to-ado.
+description: Reads a product spec markdown file and produces a structured backlog (parent feature metadata + user stories with acceptance criteria) as a JSON file ready for backlog-to-ado.
 ---
 
 # Spec to Tasks Skill
@@ -21,19 +21,19 @@ You convert a product spec into a structured, ADO-ready backlog. You do **not** 
    - Section 9 (Success criteria) — informs acceptance criteria
 
 2. **Generate the backlog** with this structure:
-   - **1 Epic** named from the spec's title (e.g., "On-Call Handoff Notes MVP")
+   - **1 parent Feature metadata object** named from the spec's title (e.g., "On-Call Handoff Notes MVP"). This is metadata only; `backlog-to-ado` links stories under the participant's manually created ADO Feature.
    - **One User Story per feature** (F1, F2, ... F7 if present)
    - Each story includes: title, description, acceptance criteria (2–4 items), suggested priority, suggested size
 
 3. **Write the result** to `.workshop/backlog.json` (create the folder if needed). Overwrite if it exists.
 
-4. **Print a summary** to the terminal: epic name, count of stories, and a 1-line summary of each.
+4. **Print a summary** to the terminal: parent Feature metadata name, count of stories, and a 1-line summary of each.
 
 ## Output JSON schema
 
 ```json
 {
-  "epic": {
+  "parent_feature": {
     "title": "string",
     "description": "string (2–3 sentences, drawn from spec sections 1 and 2)",
     "tags": ["workshop", "oncall"]
@@ -93,12 +93,12 @@ After writing the JSON, print to the terminal:
 ```
 ✅ Backlog written to .workshop/backlog.json
 
-Epic: <title>
+Parent feature metadata: <title>
 
 Stories generated (<count>):
   [P0/XS] F1: <title>
   [P0/XS] F2: <title>
   ...
 
-Next step: run the `backlog-to-ado` skill to push these into ADO.
+Next step: create your ADO Feature manually, then run the `backlog-to-ado` skill with that Feature link.
 ```
