@@ -465,7 +465,6 @@ npm install
 | Tests hang | Make sure you're on Node 20+: `node --version` |
 | `npm install` fails building `better-sqlite3` (`gyp ERR! find Python`) | `better-sqlite3` is a native module that uses a **prebuilt binary** for your Node version — no Python/compiler needed. The error means npm couldn't find a prebuilt binary and fell back to compiling from source. Fix: use a Node version with prebuilds. This repo pins `better-sqlite3@^12`, which has prebuilds through **Node 24**. If you're on an even newer Node, install **Node 20 or 22 LTS** (`node --version` to check), delete `node_modules`, and re-run `npm install`. |
 | Dashboard looks empty | You haven't run `backlog-to-ado` yet, or your ADO items aren't tagged `workshop` |
-| WorkIQ import returns nothing | The `import:workiq` script will use mock data automatically. That's fine for the workshop. |
 | WorkIQ shows no real context | Make sure you actually sent `workiq/demo-icm-email.md` to your buddy in Phase 0 and waited ~2 min for ingestion. The F6 mock-mode fallback works regardless. |
 | I edited a skill but my changes aren't taking effect | **Reload skills.** Run `/skills reload`, or run `/restart` to reload the whole CLI while keeping your current session. **Tip:** when you `exit`, the CLI prints a session ID with a `copilot --resume <id>` command so you can pick the conversation back up where you left off. |
 | Dashboard didn't regenerate after re-running | Delete `docs/dashboard.html` first, then re-run the skill. Browsers also cache — hard-refresh with `Ctrl+F5`. |
