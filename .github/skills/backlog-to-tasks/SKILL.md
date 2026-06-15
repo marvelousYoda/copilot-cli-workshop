@@ -17,7 +17,7 @@ You turn the workshop User Stories into implementation Tasks so participants do 
   > `❌ ADO MCP server not available. Check .mcp.json and restart Copilot CLI.`
 - `.workshop/backlog.json` must exist and include `parent_feature.ado_id` plus story `ado_id` values. If it doesn't, stop and tell the user:
   > `❌ Run spec-to-tasks and backlog-to-ado first so .workshop/backlog.json contains ADO IDs.`
-- The parent work item must be a `Feature` whose title is alias-prefixed, for example `shaygupt - On-Call Handoff Notes`.
+- The parent work item must be a `Feature` whose title is alias-prefixed, for example `youralias - On-Call Handoff Notes`.
 - The parent Feature's `System.AreaPath` is the boundary. If `ADO_AREA_PATH` is set, it must match the parent Feature's area path.
 
 ## What to do

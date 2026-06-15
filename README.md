@@ -27,20 +27,11 @@ You should see `spec/oncall-handoff-notes.md` and six skills under `.github/skil
 
 **Configure ADO** (sets env vars + writes `.mcp.json` in one shot):
 
-Use these workshop inputs during ADO setup and Feature creation:
-
-| Input | Value |
-|---|---|
-| ADO organization name | `o365exchange` |
-| ADO project name | `Enterprise Cloud` |
-| Area path | `Enterprise Cloud\EC Learning\AI Skilling\A100` |
-| Parent Epic | `7487078` — `E+C AI100 Part B` |
+Your facilitator will provide the workshop ADO values during the meeting.
 
 ```powershell
 .\configure.ps1
-# It will prompt for: ADO org name, ADO project name, and your area path.
-# Or pass them on the command line:
-# .\configure.ps1 -Org "o365exchange" -Project "Enterprise Cloud" -AreaPath "Enterprise Cloud\EC Learning\AI Skilling\A100" -Alias "youralias"
+# It will prompt for the required ADO values.
 ```
 
 **Pre-flight checks:**
@@ -89,18 +80,23 @@ Copy-paste these into Copilot CLI as you go. Brackets like `<ID>` mark where to 
 
 ### Phase 1 — Spec → Tasks *(7 min)*
 
-The spec is **ready to use**. Skim it so you know what you're building:
+Open the repo folder first:
 
 ```powershell
 !code .
+```
+
+Keep the Explorer pane open so you can see generated files appear later, like `.workshop/backlog.json`, `docs/dashboard.html`, and code or test files created during the build phase. The product spec lives at `spec/oncall-handoff-notes.md`:
+
+```powershell
 !code spec/oncall-handoff-notes.md
 ```
+
+Skim the spec so you know what you're building.
 
 > **What's the  "!" for?** Inside Copilot CLI, anything you type is normally sent to the agent as a prompt. Prefixing a line with `!` tells Copilot CLI to **run it directly in your shell** instead. So `!code spec/oncall-handoff-notes.md` launches VS Code, while typing the same line *without* the `!` would just hand the text to the agent to interpret.
 >
 > **Try it both ways** to see the difference in action: first type `code spec/oncall-handoff-notes.md` (no `!`) and watch the agent respond, then run `!code spec/oncall-handoff-notes.md` and watch VS Code open.
->
-> `!code .` opens the whole repo folder in VS Code. Keep the Explorer pane open so you can see generated files appear later, like `.workshop/backlog.json`, `docs/dashboard.html`, and code or test files created during the build phase.
 >
 > Sometimes, this is useful when you don't want to exit out of your session or open another shell window.
 
@@ -118,13 +114,7 @@ Run the spec-to-tasks skill on spec/oncall-handoff-notes.md
 
 In the video/demo, create the parent Feature manually in ADO first. This makes the shared project safer and easier to explain because everyone can see their own clearly named container before Copilot writes anything.
 
-Create your Feature under this parent Epic:
-
-| Field | Value |
-|---|---|
-| Parent Epic ID | `7487078` |
-| Parent Epic title | `E+C AI100 Part B` |
-| Parent Epic URL | `https://o365exchange.visualstudio.com/Enterprise%20Cloud/_workitems/edit/7487078` |
+Your facilitator will provide the parent Epic to use during the meeting. Create your Feature under that Epic.
 
 Create a **Feature** named:
 
@@ -135,16 +125,16 @@ Create a **Feature** named:
 Example:
 
 ```text
-shaygupt - On-Call Handoff Notes
+youralias - On-Call Handoff Notes
 ```
 
-After saving the Feature, copy its **Feature ID** from the work item header. The Feature URL should look like:
+After saving the Feature, copy its **Feature ID** from the work item header. The Feature URL should look like your organization's ADO work item URL with the new Feature ID at the end.
 
 ```text
-https://o365exchange.visualstudio.com/Enterprise%20Cloud/_workitems/edit/<FEATURE_ID>
+https://dev.azure.com/<org>/<project>/_workitems/edit/<FEATURE_ID>
 ```
 
-> **Important:** if you create the Feature from inside the Epic page, copying the browser address bar may copy the **Epic** URL (`7487078`) instead of the new Feature URL. The safer shortcut is to copy the numeric **Feature ID** from the saved Feature and use that ID in the prompt.
+> **Important:** if you create the Feature from inside the Epic page, copying the browser address bar may copy the **Epic** URL instead of the new Feature URL. The safer shortcut is to copy the numeric **Feature ID** from the saved Feature and use that ID in the prompt.
 
 Then ask the skill to create the backlog under that Feature:
 

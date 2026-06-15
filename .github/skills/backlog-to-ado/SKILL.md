@@ -9,7 +9,7 @@ You take a generated backlog and push it into Azure DevOps as child User Stories
 
 ## Inputs
 - A backlog JSON file (default: `.workshop/backlog.json`).
-- A parent Feature URL or Feature ID. If the prompt omits it, read `ADO_PARENT_ID` as a fallback. The Feature title must start with the participant's alias, for example `shaygupt - On-Call Handoff Notes`.
+- A parent Feature URL or Feature ID. If the prompt omits it, read `ADO_PARENT_ID` as a fallback. The Feature title must start with the participant's alias, for example `youralias - On-Call Handoff Notes`.
 - Optional participant alias from `ADO_PARTICIPANT`. Use it to add a `participant:<alias>` tag to created User Stories.
 - The ADO organization and project come from the MCP server's configured environment. Do not ask the user for these — read them from the MCP context.
 
@@ -35,7 +35,7 @@ You take a generated backlog and push it into Azure DevOps as child User Stories
 2. **Resolve and validate the parent Feature**:
    - Accept either a full ADO URL like `https://.../_workitems/edit/<id>`, a numeric Feature ID, or `ADO_PARENT_ID`.
    - Fetch the work item and confirm `System.WorkItemType` is `Feature`.
-   - Confirm its title starts with the participant's alias, such as `shaygupt - On-Call Handoff Notes`.
+   - Confirm its title starts with the participant's alias, such as `youralias - On-Call Handoff Notes`.
    - Use the Feature's `System.AreaPath` as the area path if `ADO_AREA_PATH` is not set. If both are set and they differ, stop and explain the mismatch instead of guessing.
 
 3. **Check ADO for existing child items** under that Feature with the same titles to avoid duplicates. If a child User Story with the same title and tag `workshop` already exists under the Feature, skip it and note this in the summary. **Never delete or modify existing items.**
