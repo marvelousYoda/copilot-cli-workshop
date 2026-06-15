@@ -59,6 +59,22 @@ copilot
 
 ---
 
+## Phase 0 — Seed WorkIQ context *(2 min — do this first)*
+
+Later, in **Phase 4**, you'll build **F6 (Import suggested notes from WorkIQ)**, which scans your emails, Teams chats, meetings, and IcMs for handoff-worthy context. To make that real instead of canned, seed WorkIQ with a dummy IcM **now**, so it's ingested by the time you get there.
+
+```powershell
+!code workiq/demo-icm-email.md
+```
+
+1. **Pair up** with the person next to you and swap email addresses.
+2. Open `workiq/demo-icm-email.md`, paste the **Subject** and **Body** into a new Outlook email **to your buddy**, and send it. (You'll get theirs too — now you both have inbound context.)
+3. **Carry on with the rest of setup.** WorkIQ takes ~2 minutes to pick up the email, so let it bake while you configure ADO and run Phases 1–3.
+
+> **Why a real email?** WorkIQ draws on your actual work context. Sending the IcM gives F6 something genuine to surface — and gets you used to how WorkIQ ingests context. (If it hasn't ingested by the time you reach F6, that's fine: the import script still has a mock-mode fallback.)
+
+---
+
 ## The workshop loop
 
 > **Spec → Backlog → Visualize → Build → PR → Review → Visualize again**
@@ -233,6 +249,8 @@ Run the tests when done.
 
 Once F1 is green, repeat the claim → build loop for **F2 (List all handoff notes)** so you can actually see the notes you create. Then, if time allows, take on **F6 (WorkIQ import)** — or save it as homework.
 
+> **F6 tip:** the dummy IcM you emailed your buddy back in [Phase 0](#phase-0--seed-workiq-context-2-min--do-this-first) should be in WorkIQ's context by now — that's the live data F6 can surface. If it isn't, the import script's mock-mode fallback still works.
+
 Iterate with Copilot CLI as it works.
 
 > 💡 **Go for the full app — and beyond.** Implementing *all* the stories gets you a genuinely useful, full-featured handoff tool, so don't stop at one. And don't feel boxed in by the backlog: if you imagine a feature that isn't on the list — dark mode, search, Slack/Teams export, an LLM-written shift summary, whatever — build it! This is the whole point of working with AI: it collapses the cost of trying ideas, so lean into your creativity and go above and beyond. The best demos at the end are usually the ones where someone followed a "what if…" and let Copilot CLI run with it.
@@ -395,6 +413,8 @@ What changed in this repo in the last 24 hours?
 .
 ├── spec/
 │   └── oncall-handoff-notes.md   # The product spec — edit me in Phase 1
+├── workiq/
+│   └── demo-icm-email.md         # Dummy IcM email to seed WorkIQ context — send during Phase 0
 ├── src/server.js                 # Hello-world Express app — your starting point
 ├── tests/server.test.js          # One passing smoke test
 ├── data/                         # SQLite file will live here
@@ -445,7 +465,7 @@ npm install
 | Tests hang | Make sure you're on Node 20+: `node --version` |
 | `npm install` fails building `better-sqlite3` (`gyp ERR! find Python`) | `better-sqlite3` is a native module that uses a **prebuilt binary** for your Node version — no Python/compiler needed. The error means npm couldn't find a prebuilt binary and fell back to compiling from source. Fix: use a Node version with prebuilds. This repo pins `better-sqlite3@^12`, which has prebuilds through **Node 24**. If you're on an even newer Node, install **Node 20 or 22 LTS** (`node --version` to check), delete `node_modules`, and re-run `npm install`. |
 | Dashboard looks empty | You haven't run `backlog-to-ado` yet, or your ADO items aren't tagged `workshop` |
-| WorkIQ import returns nothing | The `import:workiq` script will use mock data automatically. That's fine for the workshop. |
+| WorkIQ shows no real context | Make sure you actually sent `workiq/demo-icm-email.md` to your buddy in Phase 0 and waited ~2 min for ingestion. The F6 mock-mode fallback works regardless. |
 | I edited a skill but my changes aren't taking effect | **Reload skills.** Run `/skills reload`, or run `/restart` to reload the whole CLI while keeping your current session. **Tip:** when you `exit`, the CLI prints a session ID with a `copilot --resume <id>` command so you can pick the conversation back up where you left off. |
 | Dashboard didn't regenerate after re-running | Delete `docs/dashboard.html` first, then re-run the skill. Browsers also cache — hard-refresh with `Ctrl+F5`. |
 
