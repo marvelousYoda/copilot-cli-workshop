@@ -31,7 +31,7 @@ Write-Host ""
 
 # Interactive prompts if not provided
 if (-not $Org) {
-    $Org = Read-Host "ADO organization name (e.g. 'contoso' or 'o365exchange')"
+    $Org = Read-Host "ADO organization name (for example, 'contoso')"
 }
 if (-not $Project) {
     $Project = Read-Host "ADO project name (e.g. 'MyTeam-Workshop')"
@@ -55,21 +55,19 @@ if ($ParentId -and $ParentId -notmatch '^\d+$') {
     exit 1
 }
 
-# Safeguard: refuse to point at known shared projects without an area path
-$sharedProjects = @("Enterprise Cloud", "OS", "AzureDevOps", "DevDiv", "Office")
-if ($sharedProjects -contains $Project -and (-not $AreaPath -or $AreaPath -eq $Project)) {
+# Safeguard: refuse to point at the project root without a specific area path.
+if (-not $AreaPath -or $AreaPath -eq $Project) {
     Write-Host ""
-    Write-Host "X '$Project' is a known shared project." -ForegroundColor Red
-    Write-Host "  Refusing to configure without a more specific area path," -ForegroundColor Red
-    Write-Host "  to prevent polluting the shared backlog." -ForegroundColor Red
+    Write-Host "X Refusing to configure without a specific area path." -ForegroundColor Red
+    Write-Host "  Use the area path provided by your facilitator to avoid writing to the wrong backlog." -ForegroundColor Red
     Write-Host ""
-    Write-Host "  Re-run with your team's area path, e.g.:" -ForegroundColor Yellow
-    Write-Host "    .\configure.ps1 -Org '$Org' -Project '$Project' -AreaPath '$Project\YourTeam'" -ForegroundColor Yellow
+    Write-Host "  Re-run with the provided area path, for example:" -ForegroundColor Yellow
+    Write-Host "    .\configure.ps1 -Org '$Org' -Project '$Project' -AreaPath '$Project\Workshop'" -ForegroundColor Yellow
     exit 1
 }
-if ($sharedProjects -contains $Project -and -not $ParentId) {
+if (-not $ParentId) {
     Write-Host ""
-    Write-Host "! '$Project' is a shared project and no -ParentId was given." -ForegroundColor Yellow
+    Write-Host "! No -ParentId was given." -ForegroundColor Yellow
     Write-Host "  That's OK if you'll paste your Feature URL when running backlog-to-ado." -ForegroundColor Yellow
     Write-Host "  Create a Feature in ADO named '$Alias - On-Call Handoff Notes'," -ForegroundColor Yellow
     Write-Host "  then either paste its URL into the skill prompt or re-run with -ParentId <id>." -ForegroundColor Yellow
@@ -100,11 +98,7 @@ Write-Host "[ OK ] Wrote $mcpPath with org='$Org' project='$Project'" -Foregroun
 
 # Step 3: configure az defaults if az is installed (silent if not)
 if (Get-Command az -ErrorAction SilentlyContinue) {
-    $orgUrl = if ($Org -eq "o365exchange") {
-        "https://o365exchange.visualstudio.com/"
-    } else {
-        "https://dev.azure.com/$Org/"
-    }
+    $orgUrl = "https://dev.azure.com/$Org/"
     az devops configure --defaults organization=$orgUrl project="$Project" 2>$null | Out-Null
     Write-Host "[ OK ] Configured 'az devops' defaults" -ForegroundColor Green
 }

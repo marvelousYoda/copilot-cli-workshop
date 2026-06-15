@@ -15,7 +15,7 @@ Both runs use **exactly the same skill** with no parameters. The dashboard adapt
 
 ## Inputs
 - Optional parent Feature URL or ID. If omitted, read `.workshop/backlog.json` and use `parent_feature.ado_id`.
-- Optional participant alias. If omitted, infer it from the parent Feature title prefix, for example `shaygupt - On-Call Handoff Notes`.
+- Optional participant alias. If omitted, infer it from the parent Feature title prefix, for example `youralias - On-Call Handoff Notes`.
 
 ## Prerequisites
 - The ADO MCP server must be available. If it isn't, stop and tell the user:
