@@ -1,8 +1,8 @@
 {
   "name": "oncall-handoff-notes",
   "version": "0.1.0",
-  "private": true,
   "description": "Workshop starter: From Backlog to Product with Copilot CLI",
+  "license": "MIT",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
