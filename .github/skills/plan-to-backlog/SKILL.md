@@ -1,11 +1,11 @@
 ---
-name: backlog-to-ado
-description: Reads .workshop/backlog.json (produced by spec-to-tasks) and creates user stories under a participant-created Azure DevOps Feature via the ADO MCP server. Requires a Feature URL or ID whose title starts with the participant's alias.
+name: plan-to-backlog
+description: Reads .workshop/backlog.json (produced by spec-to-plan) and creates user stories under a participant-created Azure DevOps Feature via the ADO MCP server. Requires a Feature URL or ID whose title starts with the participant's alias.
 ---
 
 # Backlog to ADO Skill
 
-You take a generated backlog and push it into Azure DevOps as child User Stories under an existing Feature, using the ADO MCP server. You do **not** generate the backlog yourself — `spec-to-tasks` does that. You also do **not** create the parent Feature; the participant creates it manually in ADO so the workshop video shows the boundary before the skill writes anything.
+You take a generated backlog plan and push it into Azure DevOps as child User Stories under an existing Feature, using the ADO MCP server. You do **not** generate the backlog yourself - `spec-to-plan` does that. You also do **not** create the parent Feature; the participant creates it manually in ADO so the workshop video shows the boundary before the skill writes anything.
 
 ## Inputs
 - A backlog JSON file (default: `.workshop/backlog.json`).
@@ -17,7 +17,7 @@ You take a generated backlog and push it into Azure DevOps as child User Stories
 - The ADO MCP server must be available. If it isn't, stop and tell the user:
   > `❌ ADO MCP server not available. Check .mcp.json and restart Copilot CLI.`
 - The backlog JSON file must exist. If it doesn't, stop and tell the user:
-  > `❌ No backlog found at .workshop/backlog.json. Run the spec-to-tasks skill first.`
+  > `❌ No backlog found at .workshop/backlog.json. Run the spec-to-plan skill first.`
 - The user must provide a parent Feature URL/ID or set `ADO_PARENT_ID`. If neither is available, stop and ask for it:
   > `❌ Please provide the ADO Feature link or ID for your manually created Feature, named like "<alias> - On-Call Handoff Notes".`
 - The parent work item must be a `Feature`. Fetch it before creating anything. If it is not a Feature, stop with:

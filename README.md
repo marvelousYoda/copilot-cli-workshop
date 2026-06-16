@@ -103,7 +103,7 @@ Skim the spec so you know what you're building.
 Then generate the task list:
 
 ```
-Run the spec-to-tasks skill on spec/oncall-handoff-notes.md
+Run the spec-to-plan skill on spec/oncall-handoff-notes.md
 ```
 
 **Output:** `.workshop/backlog.json` — review it, make sure it looks right.
@@ -139,7 +139,7 @@ https://dev.azure.com/<org>/<project>/_workitems/edit/<FEATURE_ID>
 Then ask the skill to create the backlog under that Feature:
 
 ```
-Run the backlog-to-ado skill using this parent feature: <FEATURE_ID>
+Run the plan-to-backlog skill using this parent feature: <FEATURE_ID>
 ```
 
 **Output:** User Stories appear as children of your manually created Feature, all tagged `workshop`.
@@ -149,7 +149,7 @@ Run the backlog-to-ado skill using this parent feature: <FEATURE_ID>
 Run one more skill to create the implementation Tasks, assign them to you, and set Effort (Hours) using the workshop's 1/3/5-hour sizing convention:
 
 ```
-Run the backlog-to-tasks skill
+Run the backlog-breakdown skill
 ```
 
 **Output:** Tasks appear under the User Stories, assigned to you, with **Original Estimate** and **Remaining** set to 1, 3, or 5 hours.
@@ -193,7 +193,7 @@ Assign them to me, and pin them under the same area path as the parent.
 For each Task, set Effort (Hours): Original Estimate and Remaining to one of 1, 3, or 5.
 ```
 
-> **Effort sizing rule of thumb:** use **1 hour** for a small route/query change, **3 hours** for normal UI + test work, and **5 hours** for larger integration work like WorkIQ import. The `backlog-to-tasks` skill applies this automatically for the standard workshop backlog.
+> **Effort sizing rule of thumb:** use **1 hour** for a small route/query change, **3 hours** for normal UI + test work, and **5 hours** for larger integration work like WorkIQ import. The `backlog-breakdown` skill applies this automatically for the standard workshop backlog.
 
 ### Phase 3 — Visualize the backlog (Run #1) *(7 min)*
 
@@ -340,16 +340,16 @@ Same skill, run twice. That's the lesson.
 
 | Skill | What it does | Mutates state? |
 |---|---|---|
-| `spec-to-tasks` | Reads the spec → writes `.workshop/backlog.json` | No (file write only) |
-| `backlog-to-ado` | Reads the JSON → creates ADO User Stories under your manual Feature | Yes (creates ADO items, idempotent) |
-| `backlog-to-tasks` | Creates child Tasks, assigns them, and sets 1/3/5-hour Effort | Yes (creates/updates Task items, idempotent) |
+| `spec-to-plan` | Reads the spec → writes `.workshop/backlog.json` | No (file write only) |
+| `plan-to-backlog` | Reads the JSON → creates ADO User Stories under your manual Feature | Yes (creates ADO items, idempotent) |
+| `backlog-breakdown` | Creates child Tasks, assigns them, and sets 1/3/5-hour Effort | Yes (creates/updates Task items, idempotent) |
 | `backlog-organizer` | Analyzes the ADO backlog → tags gaps, adds comments, renders dashboard | Yes (tags + comments only; never changes state/assignee) |
 | `pr-review` | Reviews your PR against team standards | Yes (posts review on PR) |
 | `pr-summarizer` | Generates a clean PR description from the diff | Yes (updates PR description) |
 
 All skills live in `.github/skills/<skill-name>/SKILL.md` and are version-controlled with the repo. Share them with your team by sharing the repo.
 
-**What is a skill?** A skill is a small Markdown instruction pack that teaches Copilot CLI how to do one repeatable workflow. For example, `.github/skills/backlog-to-tasks/SKILL.md` tells Copilot how to create child Tasks, assign them, and set Effort without a pile of follow-up prompts.
+**What is a skill?** A skill is a small Markdown instruction pack that teaches Copilot CLI how to do one repeatable workflow. For example, `.github/skills/backlog-breakdown/SKILL.md` tells Copilot how to create child Tasks, assign them, and set Effort without a pile of follow-up prompts.
 
 ---
 
@@ -409,14 +409,14 @@ What changed in this repo in the last 24 hours?
 ├── tests/server.test.js          # One passing smoke test
 ├── data/                         # SQLite file will live here
 ├── docs/                         # backlog-organizer writes dashboard.html here
-├── .workshop/                    # spec-to-tasks writes backlog.json here
+├── .workshop/                    # spec-to-plan writes backlog.json here
 ├── .mcp.json                     # ADO MCP server config (edit org)
 ├── .github/
 │   ├── copilot-instructions.md   # Auto-loaded rules (scopes ADO work to your area path)
 │   └── skills/
-│       ├── spec-to-tasks/SKILL.md
-│       ├── backlog-to-ado/SKILL.md
-│       ├── backlog-to-tasks/SKILL.md
+│       ├── spec-to-plan/SKILL.md
+│       ├── plan-to-backlog/SKILL.md
+│       ├── backlog-breakdown/SKILL.md
 │       ├── backlog-organizer/SKILL.md
 │       ├── pr-review/SKILL.md
 │       └── pr-summarizer/SKILL.md
@@ -454,7 +454,7 @@ npm install
 | I opened a new terminal and my work items go to the wrong area | ADO env vars are session-scoped. Re-run `.\configure.ps1` in the new terminal, **then** restart `copilot`. |
 | Tests hang | Make sure you're on Node 20+: `node --version` |
 | `npm install` fails building `better-sqlite3` (`gyp ERR! find Python`) | `better-sqlite3` is a native module that uses a **prebuilt binary** for your Node version — no Python/compiler needed. The error means npm couldn't find a prebuilt binary and fell back to compiling from source. Fix: use a Node version with prebuilds. This repo pins `better-sqlite3@^12`, which has prebuilds through **Node 24**. If you're on an even newer Node, install **Node 20 or 22 LTS** (`node --version` to check), delete `node_modules`, and re-run `npm install`. |
-| Dashboard looks empty | You haven't run `backlog-to-ado` yet, or your ADO items aren't tagged `workshop` |
+| Dashboard looks empty | You haven't run `plan-to-backlog` yet, or your ADO items aren't tagged `workshop` |
 | WorkIQ shows no real context | Make sure you actually sent `workiq/demo-icm-email.md` to your buddy in Phase 0 and waited ~2 min for ingestion. The F6 mock-mode fallback works regardless. |
 | I edited a skill but my changes aren't taking effect | **Reload skills.** Run `/skills reload`, or run `/restart` to reload the whole CLI while keeping your current session. **Tip:** when you `exit`, the CLI prints a session ID with a `copilot --resume <id>` command so you can pick the conversation back up where you left off. |
 | Dashboard didn't regenerate after re-running | Delete `docs/dashboard.html` first, then re-run the skill. Browsers also cache — hard-refresh with `Ctrl+F5`. |

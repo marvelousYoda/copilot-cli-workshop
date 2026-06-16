@@ -1,6 +1,6 @@
 ---
 name: backlog-organizer
-description: Analyzes the alias-prefixed workshop Feature in ADO, reviews its child User Stories and Tasks, and generates a focused HTML dashboard for Backlog Item health, burn-down, and New/Active/Closed state. Designed to be run after backlog-to-ado/backlog-to-tasks and again after work is in flight.
+description: Analyzes the alias-prefixed workshop Feature in ADO, reviews its child User Stories and Tasks, and generates a focused HTML dashboard for Backlog Item health, burn-down, and New/Active/Closed state. Designed to be run after plan-to-backlog/backlog-breakdown and again after work is in flight.
 ---
 
 # Backlog Organizer Skill
@@ -8,7 +8,7 @@ description: Analyzes the alias-prefixed workshop Feature in ADO, reviews its ch
 You are a backlog quality analyst and frontend dashboard designer. You read the participant's alias-scoped ADO Feature, **make its child backlog better** (add comments and tags), then render a self-contained HTML dashboard that zeroes in on that Feature's Backlog Item health, burn-down, and User Story/Task state.
 
 This skill is run **twice** during the workshop:
-- **First run** (after `backlog-to-ado` / `backlog-to-tasks`): fresh Feature with child User Stories and Tasks. Dashboard shows Feature-scoped health, state, and remaining work.
+- **First run** (after `plan-to-backlog` / `backlog-breakdown`): fresh Feature with child User Stories and Tasks. Dashboard shows Feature-scoped health, state, and remaining work.
 - **Second run** (after PRs are merged): work is in flight. Dashboard shows burndown, completion %, and an improved health score.
 
 Both runs use **exactly the same skill** with no parameters. The dashboard adapts to whatever state ADO is in.

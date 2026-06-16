@@ -1,6 +1,6 @@
 ---
-name: backlog-to-tasks
-description: Creates implementation Tasks under the workshop User Stories in ADO, assigns them to the participant, and sets Effort (Hours) using 1/3/5-hour estimates. Use after backlog-to-ado.
+name: backlog-breakdown
+description: Creates implementation Tasks under the workshop User Stories in ADO, assigns them to the participant, and sets Effort (Hours) using 1/3/5-hour estimates. Use after plan-to-backlog.
 ---
 
 # Backlog to Tasks Skill
@@ -8,7 +8,7 @@ description: Creates implementation Tasks under the workshop User Stories in ADO
 You turn the workshop User Stories into implementation Tasks so participants do not have to manually prompt for decomposition, assignment, and effort estimates.
 
 ## Inputs
-- `.workshop/backlog.json`, produced by `spec-to-tasks` and updated by `backlog-to-ado`.
+- `.workshop/backlog.json`, produced by `spec-to-plan` and updated by `plan-to-backlog`.
 - Optional parent Feature URL or ID. If omitted, use `.workshop/backlog.json` → `parent_feature.ado_id`.
 - Optional assignee. If omitted, infer the participant from the parent Feature title alias and the current authenticated ADO identity when possible. If you cannot confidently resolve the assignee, stop and ask for the participant's ADO email or display name.
 
@@ -16,7 +16,7 @@ You turn the workshop User Stories into implementation Tasks so participants do 
 - The ADO MCP server must be available. If it isn't, stop and tell the user:
   > `❌ ADO MCP server not available. Check .mcp.json and restart Copilot CLI.`
 - `.workshop/backlog.json` must exist and include `parent_feature.ado_id` plus story `ado_id` values. If it doesn't, stop and tell the user:
-  > `❌ Run spec-to-tasks and backlog-to-ado first so .workshop/backlog.json contains ADO IDs.`
+  > `❌ Run spec-to-plan and plan-to-backlog first so .workshop/backlog.json contains ADO IDs.`
 - The parent work item must be a `Feature` whose title is alias-prefixed, for example `youralias - On-Call Handoff Notes`.
 - The parent Feature's `System.AreaPath` is the boundary. If `ADO_AREA_PATH` is set, it must match the parent Feature's area path.
 

@@ -1,11 +1,11 @@
 ---
-name: spec-to-tasks
-description: Reads a product spec markdown file and produces a structured backlog (parent feature metadata + user stories with acceptance criteria) as a JSON file ready for backlog-to-ado.
+name: spec-to-plan
+description: Reads a product spec markdown file and produces a structured backlog plan (parent feature metadata + user stories with acceptance criteria) as a JSON file ready for plan-to-backlog.
 ---
 
 # Spec to Tasks Skill
 
-You convert a product spec into a structured, ADO-ready backlog. You do **not** write to ADO — that's `backlog-to-ado`'s job. Your output is a single JSON file.
+You convert a product spec into a structured, ADO-ready backlog plan. You do **not** write to ADO - that's `plan-to-backlog`'s job. Your output is a single JSON file.
 
 ## Inputs
 - A spec markdown file (default: `spec/oncall-handoff-notes.md`).
@@ -21,7 +21,7 @@ You convert a product spec into a structured, ADO-ready backlog. You do **not** 
    - Section 9 (Success criteria) — informs acceptance criteria
 
 2. **Generate the backlog** with this structure:
-   - **1 parent Feature metadata object** named from the spec's title (e.g., "On-Call Handoff Notes MVP"). This is metadata only; `backlog-to-ado` links stories under the participant's manually created ADO Feature.
+   - **1 parent Feature metadata object** named from the spec's title (e.g., "On-Call Handoff Notes MVP"). This is metadata only; `plan-to-backlog` links stories under the participant's manually created ADO Feature.
    - **One User Story per feature** (F1, F2, ... F7 if present)
    - Each story includes: title, description, acceptance criteria (2–4 items), suggested priority, suggested size
 
@@ -100,5 +100,5 @@ Stories generated (<count>):
   [P0/XS] F2: <title>
   ...
 
-Next step: create your ADO Feature manually, then run the `backlog-to-ado` skill with that Feature link.
+Next step: create your ADO Feature manually, then run the `plan-to-backlog` skill with that Feature link.
 ```

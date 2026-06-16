@@ -1,6 +1,6 @@
 # Product Spec — On-Call Handoff Notes
 
-> **Workshop instructions:** This spec is **ready to use** — read it end-to-end so you understand what you're building, then run the `spec-to-tasks` skill in the next step. No editing required.
+> **Workshop instructions:** This spec is **ready to use** - read it end-to-end so you understand what you're building, then run the `spec-to-plan` skill in the next step. No editing required.
 >
 > *(Optional — if you finish early or want to personalize: the sections marked `<OPTIONAL EDIT>` are good places to add your own voice. Skip them if you're pressed for time.)*
 
@@ -155,9 +155,9 @@ Once a handoff is written, the on-call needs to get it into Teams, an email, or 
 
 ## How this spec becomes a backlog
 
-The `spec-to-tasks` skill will read this file and produce:
+The `spec-to-plan` skill will read this file and produce:
 - **1 parent Feature metadata object** — "On-Call Handoff Notes MVP"
 - **8 User Stories** — one per feature (F1–F8)
 - Each story will have a title, description, and 2–4 acceptance criteria
 
-You'll review them, manually create your alias-prefixed ADO Feature, then `backlog-to-ado` pushes the stories under that Feature.
+You'll review them, manually create your alias-prefixed ADO Feature, then `plan-to-backlog` pushes the stories under that Feature.
